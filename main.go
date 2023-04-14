@@ -33,7 +33,8 @@ func handler(w http.ResponseWriter, r *http.Request) {
 	if name == "" {
 		name = "bff"
 	}
-	res1, _ := http.Get("https://go-codescanning-githubactions-cloudrun-api1-wsgwmfbvhq-uc.a.run.app")
+	api1Url := "https://fika-api1-nakagome-wsgwmfbvhq-uc.a.run.app"
+	res1, _ := http.Get(api1Url)
 	// 取得したURLの内容を読み込む
 	body1, _ := io.ReadAll(res1.Body)
 	// 取得した情報は[]byteなのでstringに型変換
@@ -45,7 +46,8 @@ func handler(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "Content-Type %s\n", res1.Header["Content-Type"])
 	fmt.Fprintf(w, "Method %s\n", res1.Request.Method)
 
-	res2, _ := http.Get("https://go-codescanning-githubactions-cloudrun-api2-wsgwmfbvhq-uc.a.run.app")
+	api2Url := "https://fika-api2-nakagome-wsgwmfbvhq-uc.a.run.app"
+	res2, _ := http.Get(api2Url)
 	// 取得したURLの内容を読み込む
 	body2, _ := io.ReadAll(res2.Body)
 	// 取得した情報は[]byteなのでstringに型変換
@@ -63,7 +65,8 @@ func api1Handler(w http.ResponseWriter, r *http.Request) {
 	if name == "" {
 		name = "bff"
 	}
-	res1, _ := http.Get("https://go-codescanning-githubactions-cloudrun-api1-wsgwmfbvhq-uc.a.run.app")
+	api1Url := "https://fika-api1-nakagome-wsgwmfbvhq-uc.a.run.app"
+	res1, _ := http.Get(api1Url)
 	// 取得したURLの内容を読み込む
 	body1, _ := io.ReadAll(res1.Body)
 	// 取得した情報は[]byteなのでstringに型変換
@@ -83,7 +86,8 @@ func api2Handler(w http.ResponseWriter, r *http.Request) {
 		name = "bff"
 	}
 
-	res2, _ := http.Get("https://go-codescanning-githubactions-cloudrun-api2-wsgwmfbvhq-uc.a.run.app")
+	api2Url := "https://fika-api2-nakagome-wsgwmfbvhq-uc.a.run.app"
+	res2, _ := http.Get(api2Url)
 	// 取得したURLの内容を読み込む
 	body2, _ := io.ReadAll(res2.Body)
 	// 取得した情報は[]byteなのでstringに型変換
