@@ -1,18 +1,29 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"io"
 	"log"
 	"net/http"
 	"os"
+
+	"github.com/gin-gonic/gin"
+	"google.golang.org/api/idtoken"
 )
 
+const Api1Url = "https://fika-api1-nakagome-wsgwmfbvhq-uc.a.run.app"
+const Api2Url = "https://fika-api2-nakagome-wsgwmfbvhq-uc.a.run.app"
+const ProjectId = "kaigofika-poc01"
+const Location = "us-central1"
+
 func main() {
-	log.Print("starting server...")
-	http.HandleFunc("/", handler)
-	http.HandleFunc("/api1", api1Handler)
-	http.HandleFunc("/api2", api2Handler)
+
+	router := gin.Default()
+
+	router.GET("/", handler)
+	router.GET("/api1", api1Handler)
+	router.GET("/api2", api2Handler)
 
 	// Determine port for HTTP service.
 	port := os.Getenv("PORT")
@@ -21,81 +32,93 @@ func main() {
 		log.Printf("defaulting to port %s", port)
 	}
 
-	// Start HTTP server.
-	log.Printf("listening on port %s", port)
-	if err := http.ListenAndServe(":"+port, nil); err != nil {
-		log.Fatal(err)
-	}
-}
-
-func handler(w http.ResponseWriter, r *http.Request) {
-	name := os.Getenv("NAME")
-	if name == "" {
-		name = "bff"
-	}
-	api1Url := "https://fika-api1-nakagome-wsgwmfbvhq-uc.a.run.app"
-	res1, _ := http.Get(api1Url)
-	// 取得したURLの内容を読み込む
-	body1, _ := io.ReadAll(res1.Body)
-	// 取得した情報は[]byteなのでstringに型変換
-	fmt.Fprintf(w, "Body %s\n", string(body1))
-	fmt.Fprintf(w, "Status %s\n", res1.StatusCode)
-	fmt.Fprintf(w, "URL %s\n", res1.Request.URL)
-	fmt.Fprintf(w, "Protocol %s\n", res1.Proto)
-	fmt.Fprintf(w, "Date %s\n", res1.Header["Date"])
-	fmt.Fprintf(w, "Content-Type %s\n", res1.Header["Content-Type"])
-	fmt.Fprintf(w, "Method %s\n", res1.Request.Method)
-
-	api2Url := "https://fika-api2-nakagome-wsgwmfbvhq-uc.a.run.app"
-	res2, _ := http.Get(api2Url)
-	// 取得したURLの内容を読み込む
-	body2, _ := io.ReadAll(res2.Body)
-	// 取得した情報は[]byteなのでstringに型変換
-	fmt.Fprintf(w, "Body %s\n", string(body2))
-	fmt.Fprintf(w, "Status %s\n", res2.StatusCode)
-	fmt.Fprintf(w, "URL %s\n", res2.Request.URL)
-	fmt.Fprintf(w, "Protocol %s\n", res2.Proto)
-	fmt.Fprintf(w, "Date %s\n", res2.Header["Date"])
-	fmt.Fprintf(w, "Content-Type %s\n", res2.Header["Content-Type"])
-	fmt.Fprintf(w, "Method %s\n", res2.Request.Method)
-}
-
-func api1Handler(w http.ResponseWriter, r *http.Request) {
-	name := os.Getenv("NAME")
-	if name == "" {
-		name = "bff"
-	}
-	api1Url := "https://fika-api1-nakagome-wsgwmfbvhq-uc.a.run.app"
-	res1, _ := http.Get(api1Url)
-	// 取得したURLの内容を読み込む
-	body1, _ := io.ReadAll(res1.Body)
-	// 取得した情報は[]byteなのでstringに型変換
-	fmt.Fprintf(w, "Body %s\n", string(body1))
-	fmt.Fprintf(w, "Status %s\n", res1.StatusCode)
-	fmt.Fprintf(w, "URL %s\n", res1.Request.URL)
-	fmt.Fprintf(w, "Protocol %s\n", res1.Proto)
-	fmt.Fprintf(w, "Date %s\n", res1.Header["Date"])
-	fmt.Fprintf(w, "Content-Type %s\n", res1.Header["Content-Type"])
-	fmt.Fprintf(w, "Method %s\n", res1.Request.Method)
+	router.Run("0.0.0.0:" + port)
 
 }
 
-func api2Handler(w http.ResponseWriter, r *http.Request) {
-	name := os.Getenv("NAME")
-	if name == "" {
-		name = "bff"
-	}
+func handler(c *gin.Context) {
 
-	api2Url := "https://fika-api2-nakagome-wsgwmfbvhq-uc.a.run.app"
-	res2, _ := http.Get(api2Url)
+	ctx := context.Background()
+	client, err := idtoken.NewClient(ctx, Api1Url)
+	if err != nil {
+		fmt.Printf("idtoken.NewClient: %v\n", err)
+		c.JSON(http.StatusInternalServerError, err)
+		return
+	}
+	resp, err := client.Get(Api1Url)
+	if err != nil {
+		fmt.Printf("client.Get: %v\n", err)
+		c.JSON(http.StatusInternalServerError, err)
+		return
+	}
+	defer resp.Body.Close()
 	// 取得したURLの内容を読み込む
-	body2, _ := io.ReadAll(res2.Body)
-	// 取得した情報は[]byteなのでstringに型変換
-	fmt.Fprintf(w, "Body %s\n", string(body2))
-	fmt.Fprintf(w, "Status %s\n", res2.StatusCode)
-	fmt.Fprintf(w, "URL %s\n", res2.Request.URL)
-	fmt.Fprintf(w, "Protocol %s\n", res2.Proto)
-	fmt.Fprintf(w, "Date %s\n", res2.Header["Date"])
-	fmt.Fprintf(w, "Content-Type %s\n", res2.Header["Content-Type"])
-	fmt.Fprintf(w, "Method %s\n", res2.Request.Method)
+	body, _ := io.ReadAll(resp.Body)
+	log.Println(string(body))
+	c.JSON(resp.StatusCode, string(body))
+
+	client2, err2 := idtoken.NewClient(ctx, Api2Url)
+	if err2 != nil {
+		fmt.Printf("idtoken.NewClient: %v\n", err)
+		c.JSON(http.StatusInternalServerError, err)
+		return
+	}
+	resp2, err2 := client2.Get(Api2Url)
+	if err2 != nil {
+		fmt.Printf("client.Get: %v\n", err)
+		c.JSON(http.StatusInternalServerError, err)
+		return
+	}
+	defer resp2.Body.Close()
+	// 取得したURLの内容を読み込む
+	body2, _ := io.ReadAll(resp2.Body)
+	log.Println(string(body2))
+	c.JSON(resp2.StatusCode, string(body2))
+
+}
+
+func api1Handler(c *gin.Context) {
+
+	ctx := context.Background()
+	client, err := idtoken.NewClient(ctx, Api1Url)
+	if err != nil {
+		fmt.Printf("idtoken.NewClient: %v\n", err)
+		c.JSON(http.StatusInternalServerError, err)
+		return
+	}
+	resp, err := client.Get(Api1Url)
+	if err != nil {
+		fmt.Printf("client.Get: %v\n", err)
+		c.JSON(http.StatusInternalServerError, err)
+		return
+	}
+	defer resp.Body.Close()
+	// 取得したURLの内容を読み込む
+	body, _ := io.ReadAll(resp.Body)
+	log.Println(string(body))
+	c.JSON(resp.StatusCode, string(body))
+
+}
+
+func api2Handler(c *gin.Context) {
+
+	ctx := context.Background()
+	client2, err2 := idtoken.NewClient(ctx, Api2Url)
+	if err2 != nil {
+		fmt.Printf("idtoken.NewClient: %v\n", err)
+		c.JSON(http.StatusInternalServerError, err)
+		return
+	}
+	resp2, err2 := client2.Get(Api2Url)
+	if err2 != nil {
+		fmt.Printf("client.Get: %v\n", err)
+		c.JSON(http.StatusInternalServerError, err)
+		return
+	}
+	defer resp2.Body.Close()
+	// 取得したURLの内容を読み込む
+	body2, _ := io.ReadAll(resp2.Body)
+	log.Println(string(body2))
+	c.JSON(resp2.StatusCode, string(body2))
+
 }
