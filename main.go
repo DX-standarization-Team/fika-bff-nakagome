@@ -105,14 +105,14 @@ func api2Handler(c *gin.Context) {
 	ctx := context.Background()
 	client2, err2 := idtoken.NewClient(ctx, Api2Url)
 	if err2 != nil {
-		fmt.Printf("idtoken.NewClient: %v\n", err)
-		c.JSON(http.StatusInternalServerError, err)
+		fmt.Printf("idtoken.NewClient: %v\n", err2)
+		c.JSON(http.StatusInternalServerError, err2)
 		return
 	}
 	resp2, err2 := client2.Get(Api2Url)
 	if err2 != nil {
-		fmt.Printf("client.Get: %v\n", err)
-		c.JSON(http.StatusInternalServerError, err)
+		fmt.Printf("client.Get: %v\n", err2)
+		c.JSON(http.StatusInternalServerError, err2)
 		return
 	}
 	defer resp2.Body.Close()
