@@ -10,7 +10,6 @@ import (
 
 	executions "cloud.google.com/go/workflows/executions/apiv1"
 	executionspb "cloud.google.com/go/workflows/executions/apiv1/executionspb"
-	"github.com/gin-gonic/gin"
 	"google.golang.org/api/idtoken"
 )
 
@@ -22,34 +21,25 @@ const Location = "us-central1"
 const workflowName = "fs-workflow-nakagome"
 
 func main() {
+	http.HandleFunc("/workflow", workflowHandler)
+	http.HandleFunc("/api2", api2Handler)
 
-	router := gin.Default()
-
-	router.GET("/workflow", workflowHandler)
-	router.GET("/api2", api2Handler)
-
-	// Determine port for HTTP service.
 	port := os.Getenv("PORT")
 	if port == "" {
 		port = "8080"
-		log.Printf("defaulting to port %s", port)
 	}
-
-	router.Run("0.0.0.0:" + port)
-
+	if err := http.ListenAndServe(":"+port, nil); err != nil {
+		log.Fatal(err)
+	}
 }
 
-func workflowHandler(c *gin.Context) {
+func workflowHandler(w http.ResponseWriter, r *http.Request) {
 
-	// Auth0の認証情報を取り出し、派生コンテキストを返す
-	auth0Token := c.Request.Header.Get("X-Forwarded-Authorization")
-	ctx := context.WithValue(context.Background(), "auth0-token", auth0Token)
-	// ctx := context.Background()
-
+	ctx := context.Background()
 	client, err := executions.NewClient(ctx)
 	if err != nil {
 		fmt.Printf("executions.NewClient: %v\n", err)
-		c.JSON(http.StatusInternalServerError, err)
+		// http.Error(w, fmt.Sprintf("...: %w", err), http.StatusInternalServerError)
 		return
 	}
 	defer client.Close()
@@ -60,35 +50,33 @@ func workflowHandler(c *gin.Context) {
 	resp, err := client.CreateExecution(ctx, req)
 	if err != nil {
 		fmt.Printf("client.CreateExecution: %v\n", err)
-		c.JSON(http.StatusInternalServerError, err)
+		// http.Error(w, fmt.Sprintf("...: %w", err), http.StatusInternalServerError)
 	}
 	log.Println(resp)
-	c.JSON(http.StatusOK, resp)
+	fmt.Fprintf(w, "%v\n", resp)
 
 }
 
-func api2Handler(c *gin.Context) {
-	// Auth0の認証情報を取り出し、派生コンテキストを返す
-	auth0Token := c.Request.Header.Get("X-Forwarded-Authorization")
-	ctx := context.WithValue(context.Background(), "auth0-token", auth0Token)
-	// ctx := context.Background()
+func api2Handler(w http.ResponseWriter, r *http.Request) {
+	// Auth0の認証情報を取り出す
+	auth0Token := r.Header.Get("X-Forwarded-Authorization")
 
+	ctx := context.WithValue(context.Background(), "auth0-token", auth0Token)
 	client, err := idtoken.NewClient(ctx, Api2Url)
 	if err != nil {
 		fmt.Printf("idtoken.NewClient: %v\n", err)
-		c.JSON(http.StatusInternalServerError, err)
+		// http.Error(w, fmt.Sprintf("...: %w", err), http.StatusInternalServerError)
 		return
 	}
 	resp, err := client.Get(Api2Url)
 	if err != nil {
 		fmt.Printf("client.Get: %v\n", err)
-		c.JSON(http.StatusInternalServerError, err)
+		// http.Error(w, fmt.Sprintf("...: %w", err), http.StatusInternalServerError)
 		return
 	}
 	defer resp.Body.Close()
 	// 取得したURLの内容を読み込む
 	body, _ := io.ReadAll(resp.Body)
 	log.Println(string(body))
-	c.JSON(resp.StatusCode, string(body))
-
+	fmt.Fprintf(w, "%s\n", string(body))
 }
