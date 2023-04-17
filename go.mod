@@ -4,6 +4,7 @@ go 1.13
 
 require (
 	cloud.google.com/go/compute v1.19.1 // indirect
+	cloud.google.com/go/workflows v1.10.0 // indirect
 	github.com/bytedance/sonic v1.8.7 // indirect
 	github.com/gin-gonic/gin v1.9.0 // indirect
 	github.com/go-playground/validator/v10 v10.12.0 // indirect
