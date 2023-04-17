@@ -60,7 +60,6 @@ func workflowHandler(w http.ResponseWriter, r *http.Request) {
 func api2Handler(w http.ResponseWriter, r *http.Request) {
 	// Auth0の認証情報を取り出す
 	auth0Token := r.Header.Get("X-Forwarded-Authorization")
-
 	ctx := context.WithValue(context.Background(), "auth0-token", auth0Token)
 	client, err := idtoken.NewClient(ctx, Api2Url)
 	if err != nil {
@@ -68,13 +67,20 @@ func api2Handler(w http.ResponseWriter, r *http.Request) {
 		// http.Error(w, fmt.Sprintf("...: %w", err), http.StatusInternalServerError)
 		return
 	}
-	resp, err := client.Get(Api2Url)
+
+	req, _ := http.NewRequestWithContext(ctx, "GET", Api2Url, nil)
+	resp, err := client.Do(req)
 	if err != nil {
-		fmt.Printf("client.Get: %v\n", err)
-		// http.Error(w, fmt.Sprintf("...: %w", err), http.StatusInternalServerError)
-		return
+		log.Fatalf("%v", err)
 	}
-	defer resp.Body.Close()
+
+	// resp, err := client.Get(Api2Url)
+	// if err != nil {
+	// 	fmt.Printf("client.Get: %v\n", err)
+	// 	// http.Error(w, fmt.Sprintf("...: %w", err), http.StatusInternalServerError)
+	// 	return
+	// }
+	// defer resp.Body.Close()
 	// 取得したURLの内容を読み込む
 	body, _ := io.ReadAll(resp.Body)
 	log.Println(string(body))
