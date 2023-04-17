@@ -41,11 +41,10 @@ func main() {
 
 func workflowHandler(c *gin.Context) {
 
-	// ctx := context.Background()
-
 	// Auth0の認証情報を取り出し、派生コンテキストを返す
 	auth0Token := c.Request.Header.Get("X-Forwarded-Authorization")
 	ctx := context.WithValue(context.Background(), "auth0-token", auth0Token)
+	// ctx := context.Background()
 
 	client, err := executions.NewClient(ctx)
 	if err != nil {
@@ -90,6 +89,6 @@ func api2Handler(c *gin.Context) {
 	// 取得したURLの内容を読み込む
 	body, _ := io.ReadAll(resp.Body)
 	log.Println(string(body))
-	c.JSON(resp.StatusCode, auth0Token+string(body))
+	c.JSON(resp.StatusCode, string(body))
 
 }
