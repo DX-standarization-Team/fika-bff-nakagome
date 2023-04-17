@@ -25,8 +25,6 @@ func main() {
 
 	router := gin.Default()
 
-	// router.GET("/", handler)
-	// router.GET("/api1", api1Handler)
 	router.GET("/workflow", workflowHandler)
 	router.GET("/api2", api2Handler)
 
@@ -38,93 +36,6 @@ func main() {
 	}
 
 	router.Run("0.0.0.0:" + port)
-
-}
-
-// func handler(c *gin.Context) {
-
-// 	ctx := context.Background()
-// 	client, err := idtoken.NewClient(ctx, Api1Url)
-// 	if err != nil {
-// 		fmt.Printf("idtoken.NewClient: %v\n", err)
-// 		c.JSON(http.StatusInternalServerError, err)
-// 		return
-// 	}
-// 	resp, err := client.Get(Api1Url)
-// 	if err != nil {
-// 		fmt.Printf("client.Get: %v\n", err)
-// 		c.JSON(http.StatusInternalServerError, err)
-// 		return
-// 	}
-// 	defer resp.Body.Close()
-// 	// 取得したURLの内容を読み込む
-// 	body, _ := io.ReadAll(resp.Body)
-// 	log.Println(string(body))
-// 	c.JSON(resp.StatusCode, string(body))
-
-// 	client2, err2 := idtoken.NewClient(ctx, Api2Url)
-// 	if err2 != nil {
-// 		fmt.Printf("idtoken.NewClient: %v\n", err)
-// 		c.JSON(http.StatusInternalServerError, err)
-// 		return
-// 	}
-// 	resp2, err2 := client2.Get(Api2Url)
-// 	if err2 != nil {
-// 		fmt.Printf("client.Get: %v\n", err)
-// 		c.JSON(http.StatusInternalServerError, err)
-// 		return
-// 	}
-// 	defer resp2.Body.Close()
-// 	// 取得したURLの内容を読み込む
-// 	body2, _ := io.ReadAll(resp2.Body)
-// 	log.Println(string(body2))
-// 	c.JSON(resp2.StatusCode, string(body2))
-
-// }
-
-// func api1Handler(c *gin.Context) {
-
-// 	ctx := context.Background()
-// 	client, err := idtoken.NewClient(ctx, Api1Url)
-// 	if err != nil {
-// 		fmt.Printf("idtoken.NewClient: %v\n", err)
-// 		c.JSON(http.StatusInternalServerError, err)
-// 		return
-// 	}
-// 	resp, err := client.Get(Api1Url)
-// 	if err != nil {
-// 		fmt.Printf("client.Get: %v\n", err)
-// 		c.JSON(http.StatusInternalServerError, err)
-// 		return
-// 	}
-// 	defer resp.Body.Close()
-// 	// 取得したURLの内容を読み込む
-// 	body, _ := io.ReadAll(resp.Body)
-// 	log.Println(string(body))
-// 	c.JSON(resp.StatusCode, string(body))
-
-// }
-
-func api2Handler(c *gin.Context) {
-
-	ctx := context.Background()
-	client, err := idtoken.NewClient(ctx, Api2Url)
-	if err != nil {
-		fmt.Printf("idtoken.NewClient: %v\n", err)
-		c.JSON(http.StatusInternalServerError, err)
-		return
-	}
-	resp, err := client.Get(Api2Url)
-	if err != nil {
-		fmt.Printf("client.Get: %v\n", err)
-		c.JSON(http.StatusInternalServerError, err)
-		return
-	}
-	defer resp.Body.Close()
-	// 取得したURLの内容を読み込む
-	body, _ := io.ReadAll(resp.Body)
-	log.Println(string(body))
-	c.JSON(resp.StatusCode, string(body))
 
 }
 
@@ -149,5 +60,31 @@ func workflowHandler(c *gin.Context) {
 	}
 	log.Println(resp)
 	c.JSON(http.StatusOK, resp)
+
+}
+
+func api2Handler(c *gin.Context) {
+	// Auth0の認証情報を取り出し、派生コンテキストを返す
+	auth0Token := c.Request.Header.Get("X-Forwarded-Authorization")
+	ctx := context.WithValue(context.Background(), "auth0-token", auth0Token)
+	// ctx := context.Background()
+
+	client, err := idtoken.NewClient(ctx, Api2Url)
+	if err != nil {
+		fmt.Printf("idtoken.NewClient: %v\n", err)
+		c.JSON(http.StatusInternalServerError, err)
+		return
+	}
+	resp, err := client.Get(Api2Url)
+	if err != nil {
+		fmt.Printf("client.Get: %v\n", err)
+		c.JSON(http.StatusInternalServerError, err)
+		return
+	}
+	defer resp.Body.Close()
+	// 取得したURLの内容を読み込む
+	body, _ := io.ReadAll(resp.Body)
+	log.Println(string(body))
+	c.JSON(resp.StatusCode, string(body))
 
 }
