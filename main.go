@@ -36,6 +36,8 @@ func main() {
 // BFF → workflow → api2 呼び出し
 func workflowHandler(w http.ResponseWriter, r *http.Request) {
 
+	// Auth0の認証情報を取り出す
+	auth0Token := r.Header.Get("X-Forwarded-Authorization")
 	ctx := context.Background()
 	client, err := executions.NewClient(ctx)
 	if err != nil {
@@ -47,7 +49,11 @@ func workflowHandler(w http.ResponseWriter, r *http.Request) {
 
 	req := &executionspb.CreateExecutionRequest{
 		Parent: "projects/" + ProjectId + "/locations/" + Location + "/workflows/" + workflowName,
+		execution: {
+			argument: JSON.stringify({"auth0Token": auth0auth0Token})
+		}
 	}
+
 	resp, err := client.CreateExecution(ctx, req)
 	if err != nil {
 		fmt.Printf("client.CreateExecution: %v\n", err)
