@@ -80,7 +80,7 @@ func api2Handler(w http.ResponseWriter, r *http.Request) {
 	// 	// http.Error(w, fmt.Sprintf("...: %w", err), http.StatusInternalServerError)
 	// 	return
 	// }
-	// defer resp.Body.Close()
+	defer resp.Body.Close()
 	// 取得したURLの内容を読み込む
 	body, _ := io.ReadAll(resp.Body)
 	log.Println(string(body))
