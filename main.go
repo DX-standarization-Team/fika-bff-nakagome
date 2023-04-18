@@ -69,6 +69,8 @@ func api2Handler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	req, _ := http.NewRequestWithContext(ctx, "GET", Api2Url, nil)
+
+	req.Header.Set("auth0-token", auth0Token)
 	resp, err := client.Do(req)
 	if err != nil {
 		log.Fatalf("%v", err)
