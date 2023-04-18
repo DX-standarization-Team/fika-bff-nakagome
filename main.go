@@ -59,10 +59,10 @@ func workflowHandler(w http.ResponseWriter, r *http.Request) {
 
 func api2Handler(w http.ResponseWriter, r *http.Request) {
 	// Auth0の認証情報を取り出す
-	auth0Token := r.Header.Get("X-Forwarded-Authorization")
-	// ctx := context.Background()
+	// auth0Token := r.Header.Get("X-Forwarded-Authorization")
+	ctx := context.Background()
 	// contextがhttpでうまくいかない
-	ctx := context.WithValue(context.Background(), "auth0-token", auth0Token)
+	// ctx := context.WithValue(context.Background(), "auth0-token", auth0Token)
 	client, err := idtoken.NewClient(ctx, Api2Url)
 	if err != nil {
 		fmt.Printf("idtoken.NewClient: %v\n", err)
@@ -70,8 +70,8 @@ func api2Handler(w http.ResponseWriter, r *http.Request) {
 	}
 	// req, _ := http.NewRequestWithContext(ctx, "GET", Api2Url, nil)
 	req, _ := http.NewRequest("GET", Api2Url, nil)
-	// こちらの方法でcontextを操作
-	req = req.WithContext(ctx)
+	// こちらの方法でcontextを操作→うまくいかない
+	// req = req.WithContext(ctx)
 	// header追加は上手くいく
 	// req.Header.Set("auth0-token", auth0Token)
 	resp, err := client.Do(req)
