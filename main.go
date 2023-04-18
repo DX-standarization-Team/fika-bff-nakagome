@@ -49,9 +49,9 @@ func workflowHandler(w http.ResponseWriter, r *http.Request) {
 
 	req := &executionspb.CreateExecutionRequest{
 		Parent: "projects/" + ProjectId + "/locations/" + Location + "/workflows/" + workflowName,
-		execution: {
-			argument: JSON.stringify({"auth0Token": auth0auth0Token})
-		}
+		Execution: &executionspb.Execution{
+			Argument: `{\"auth0-token\":\"` + auth0Token + `\"}`,
+		},
 	}
 
 	resp, err := client.CreateExecution(ctx, req)
