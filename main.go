@@ -106,7 +106,7 @@ func getPemCert(token *jwt.Token) (string, error) {
 		return cert, err
 	}
 	defer resp.Body.Close()
-	log.Println("resp %v", resp.Body)
+	log.Println(resp.Body)
 
 	var jwks = Jwks{}
 	err = json.NewDecoder(resp.Body).Decode(&jwks)
@@ -169,12 +169,12 @@ func api2Handler(w http.ResponseWriter, r *http.Request) {
 	token, err := jwt.Parse(r.Header.Get("X-Forwarded-Authorization"), func(token *jwt.Token) (interface{}, error) {
 		_, ok := token.Method.(*jwt.SigningMethodRSA)
 		if !ok {
-			//    writer.WriteHeader(http.StatusUnauthorized)
-			//    _, err := writer.Write([]byte("You're Unauthorized!"))
-			//    if err != nil {
-			// 	  return nil, err
-			//    }
-			log.Fatal("token not ok")
+			log.Fatal("You're Unauthorized!")
+			w.WriteHeader(http.StatusUnauthorized)
+			_, err := w.Write([]byte("You're Unauthorized!"))
+			if err != nil {
+				return nil, err
+			}
 		}
 		return "", nil
 	})
