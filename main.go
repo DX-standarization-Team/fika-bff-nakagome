@@ -101,7 +101,6 @@ func getPemCert(token *jwt.Token) (string, error) {
 	// Auth0の公開鍵を取得
 	cert := ""
 	resp, err := http.Get("https://" + DomainName + "/.well-known/jwks.json")
-
 	if err != nil {
 		return cert, err
 	}
@@ -110,7 +109,6 @@ func getPemCert(token *jwt.Token) (string, error) {
 
 	var jwks = Jwks{}
 	err = json.NewDecoder(resp.Body).Decode(&jwks)
-
 	if err != nil {
 		return cert, err
 	}
@@ -120,7 +118,6 @@ func getPemCert(token *jwt.Token) (string, error) {
 			cert = "-----BEGIN CERTIFICATE-----\n" + jwks.Keys[k].X5c[0] + "\n-----END CERTIFICATE-----"
 		}
 	}
-
 	if cert == "" {
 		err := errors.New("Unable to find appropriate key.")
 		return cert, err
@@ -163,10 +160,11 @@ func workflowHandler(w http.ResponseWriter, r *http.Request) {
 
 // BFF → api2 呼び出し
 func api2Handler(w http.ResponseWriter, r *http.Request) {
-	// Auth0の認証情報を取り出す
+	// Auth0の認証情報をそのまま取り出す
 	auth0Token := r.Header.Get("X-Forwarded-Authorization")
 
-	token, err := jwt.Parse(r.Header.Get("X-Forwarded-Authorization"), func(token *jwt.Token) (interface{}, error) {
+	// tokenをParseする
+	token, err := jwt.Parse(auth0Token, func(token *jwt.Token) (interface{}, error) {
 		_, ok := token.Method.(*jwt.SigningMethodRSA)
 		if !ok {
 			log.Fatal("You're Unauthorized!")
@@ -180,7 +178,11 @@ func api2Handler(w http.ResponseWriter, r *http.Request) {
 	})
 	// 認証情報の検証
 	result, err := verifyToken(token)
-	log.Println(result)
+	if err != nil {
+		log.Fatalf("検証に失敗。原因：%v", err)
+	} else {
+		log.Println(result)
+	}
 
 	// api2へのAuthorization Headerの引き渡し
 	ctx := context.Background()
