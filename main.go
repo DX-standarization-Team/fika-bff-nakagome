@@ -63,20 +63,30 @@ func verifyToken(token *jwt.Token) (interface{}, error) {
 	log.Println("verifyToken entering")
 	log.Println("token")
 	log.Println(token)
+
+	// claimsが正しい形式であるか確認
+	log.Println("claimsが正しい形式であるか確認")
+	_, ok := token.Claims.(jwt.MapClaims)
+	if !ok {
+		return token, errors.New("invalid claims type")
+	}
+
 	// Verify 'aud' claim
-	aud := Audience
-	checkAud := token.Claims.(jwt.MapClaims).VerifyAudience(aud, false)
+	log.Println("Verify 'aud' claim")
+	checkAud := token.Claims.(jwt.MapClaims).VerifyAudience(Audience, false)
 	if !checkAud {
 		fmt.Printf("Invalid audience.\n")
 		return token, errors.New("Invalid audience.")
 	}
-	// Verify 'iss' claim
+	// issフィールドを見て、正しいトークン発行者か確認する
+	log.Println("issフィールドを見て、正しいトークン発行者か確認する")
 	iss := "https://" + DomainName + "/"
 	checkIss := token.Claims.(jwt.MapClaims).VerifyIssuer(iss, false)
 	if !checkIss {
 		return token, errors.New("Invalid isssuer.")
 	}
 
+	log.Println("getPemCert")
 	cert, err := getPemCert(token)
 	if err != nil {
 		panic(err.Error())
