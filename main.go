@@ -73,7 +73,7 @@ func verifyToken(token *jwt.Token) (interface{}, error) {
 
 	// Verify 'aud' claim
 	log.Println("Verify 'aud' claim")
-	checkAud := token.Claims.(jwt.MapClaims).VerifyAudience(Audience, false)
+	checkAud := token.Claims.(jwt.MapClaims).VerifyAudience(Audience, true)
 	if !checkAud {
 		fmt.Printf("Invalid audience.\n")
 		return token, errors.New("Invalid audience.")
@@ -81,7 +81,7 @@ func verifyToken(token *jwt.Token) (interface{}, error) {
 	// issフィールドを見て、正しいトークン発行者か確認する
 	log.Println("issフィールドを見て、正しいトークン発行者か確認する")
 	iss := "https://" + DomainName + "/"
-	checkIss := token.Claims.(jwt.MapClaims).VerifyIssuer(iss, false)
+	checkIss := token.Claims.(jwt.MapClaims).VerifyIssuer(iss, true)
 	if !checkIss {
 		return token, errors.New("Invalid isssuer.")
 	}
@@ -177,9 +177,10 @@ func api2Handler(w http.ResponseWriter, r *http.Request) {
 		return "", nil
 	})
 	log.Println("Raw: ", token.Raw)
-	log.Println("Method: ", token.Method)
-	log.Println("Raw: ", token.Header)
+	log.Println("Method: ", token.Method.Alg())
+	log.Println("Header: ", token.Header)
 	log.Println("Claims: ", token.Claims)
+	log.Println("Claims Valid: ", token.Claims.Valid())
 	log.Println("Signature: ", token.Signature)
 	log.Println("Valid: ", token.Valid)
 
@@ -188,7 +189,7 @@ func api2Handler(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Fatalf("検証に失敗。原因：%v", err)
 	} else {
-		log.Println(result)
+		log.Println("Got rsa.PublicKey! ", result)
 	}
 
 	// api2へのAuthorization Headerの引き渡し
