@@ -6,8 +6,7 @@ require (
 	cloud.google.com/go/compute v1.19.1 // indirect
 	cloud.google.com/go/workflows v1.10.0
 	github.com/auth0/go-jwt-middleware v1.0.1
-	github.com/dgrijalva/jwt-go v3.2.0+incompatible
-	github.com/form3tech-oss/jwt-go v3.2.5+incompatible // indirect
+	github.com/form3tech-oss/jwt-go v3.2.5+incompatible
 	github.com/golang/groupcache v0.0.0-20210331224755-41bb18bfe9da // indirect
 	github.com/google/s2a-go v0.1.1 // indirect
 	golang.org/x/crypto v0.8.0 // indirect
