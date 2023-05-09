@@ -102,9 +102,11 @@ func getPemCert(token *jwt.Token) (string, error) {
 	cert := ""
 	resp, err := http.Get("https://" + DomainName + "/.well-known/jwks.json")
 	if err != nil {
+		log.Fatal("公開鍵を取得失敗")
 		return cert, err
 	}
 	defer resp.Body.Close()
+	log.Println("公開鍵を取得成功")
 	log.Println(resp.Body)
 
 	var jwks = Jwks{}
