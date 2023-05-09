@@ -64,27 +64,27 @@ func verifyToken(token *jwt.Token) (interface{}, error) {
 	log.Println("token")
 	log.Println(token)
 
-	// claimsが正しい形式であるか確認
-	log.Println("claimsが正しい形式であるか確認")
-	err := token.Claims.(jwt.MapClaims).Valid()
-	if err != nil {
-		return token, errors.New("invalid claims type")
-	}
+	// // claimsが正しい形式であるか確認
+	// log.Println("claimsが正しい形式であるか確認")
+	// err := token.Claims.(jwt.MapClaims).Valid()
+	// if err != nil {
+	// 	return token, errors.New("invalid claims type")
+	// }
 
-	// Verify 'aud' claim
-	log.Println("Verify 'aud' claim")
-	checkAud := token.Claims.(jwt.MapClaims).VerifyAudience(Audience, true)
-	if !checkAud {
-		fmt.Printf("Invalid audience.\n")
-		return token, errors.New("Invalid audience.")
-	}
-	// issフィールドを見て、正しいトークン発行者か確認する
-	log.Println("issフィールドを見て、正しいトークン発行者か確認する")
-	iss := "https://" + DomainName + "/"
-	checkIss := token.Claims.(jwt.MapClaims).VerifyIssuer(iss, true)
-	if !checkIss {
-		return token, errors.New("Invalid isssuer.")
-	}
+	// // Verify 'aud' claim
+	// log.Println("Verify 'aud' claim")
+	// checkAud := token.Claims.(jwt.MapClaims).VerifyAudience(Audience, true)
+	// if !checkAud {
+	// 	fmt.Printf("Invalid audience.\n")
+	// 	return token, errors.New("Invalid audience.")
+	// }
+	// // issフィールドを見て、正しいトークン発行者か確認する
+	// log.Println("issフィールドを見て、正しいトークン発行者か確認する")
+	// iss := "https://" + DomainName + "/"
+	// checkIss := token.Claims.(jwt.MapClaims).VerifyIssuer(iss, true)
+	// if !checkIss {
+	// 	return token, errors.New("Invalid isssuer.")
+	// }
 
 	log.Println("getPemCert")
 	cert, err := getPemCert(token)
@@ -165,8 +165,8 @@ func api2Handler(w http.ResponseWriter, r *http.Request) {
 
 	// tokenをParseする
 	token, err := jwt.Parse(auth0Token, func(token *jwt.Token) (interface{}, error) {
-		_, ok := token.Method.(*jwt.SigningMethodRSA)
-		if !ok {
+		// check signing method
+		if _, ok := token.Method.(*jwt.SigningMethodRSA); !ok {
 			log.Fatal("You're Unauthorized!")
 			w.WriteHeader(http.StatusUnauthorized)
 			_, err := w.Write([]byte("You're Unauthorized!"))
@@ -177,10 +177,9 @@ func api2Handler(w http.ResponseWriter, r *http.Request) {
 		return "", nil
 	})
 	log.Println("Raw: ", token.Raw)
-	log.Println("Method: ", token.Method.Alg())
+	log.Println("Method: ", token.Method)
 	log.Println("Header: ", token.Header)
 	log.Println("Claims: ", token.Claims)
-	log.Println("Claims Valid: ", token.Claims.Valid())
 	log.Println("Signature: ", token.Signature)
 	log.Println("Valid: ", token.Valid)
 
