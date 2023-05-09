@@ -66,8 +66,8 @@ func verifyToken(token *jwt.Token) (interface{}, error) {
 
 	// claimsが正しい形式であるか確認
 	log.Println("claimsが正しい形式であるか確認")
-	_, ok := token.Claims.(jwt.MapClaims)
-	if !ok {
+	err := token.Claims.(jwt.MapClaims).Valid()
+	if err != nil {
 		return token, errors.New("invalid claims type")
 	}
 
@@ -176,6 +176,13 @@ func api2Handler(w http.ResponseWriter, r *http.Request) {
 		}
 		return "", nil
 	})
+	log.Println("Raw: ", token.Raw)
+	log.Println("Method: ", token.Method)
+	log.Println("Raw: ", token.Header)
+	log.Println("Claims: ", token.Claims)
+	log.Println("Signature: ", token.Signature)
+	log.Println("Valid: ", token.Valid)
+
 	// 認証情報の検証
 	result, err := verifyToken(token)
 	if err != nil {
