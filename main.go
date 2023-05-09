@@ -12,7 +12,7 @@ import (
 	executions "cloud.google.com/go/workflows/executions/apiv1"
 	executionspb "cloud.google.com/go/workflows/executions/apiv1/executionspb"
 	jwtmiddleware "github.com/auth0/go-jwt-middleware"
-	"github.com/dgrijalva/jwt-go"
+	"github.com/form3tech-oss/jwt-go"
 	"google.golang.org/api/idtoken"
 
 	"encoding/json"
@@ -45,6 +45,7 @@ func main() {
 		ValidationKeyGetter: verifyToken,
 		SigningMethod:       jwt.SigningMethodRS256,
 	})
+	log.Println(jwtMiddleware)
 
 	http.HandleFunc("/workflow", workflowHandler)
 	http.HandleFunc("/api2", api2Handler)
@@ -168,8 +169,8 @@ func api2Handler(w http.ResponseWriter, r *http.Request) {
 		return "", nil
 	})
 	// 認証情報の検証
-	resp, err := verifyToken(token)
-	log.Println(resp)
+	result, err := verifyToken(token)
+	log.Println(result)
 
 	// api2へのAuthorization Headerの引き渡し
 	ctx := context.Background()
