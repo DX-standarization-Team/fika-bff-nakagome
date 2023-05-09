@@ -155,8 +155,20 @@ func api2Handler(w http.ResponseWriter, r *http.Request) {
 	// Auth0の認証情報を取り出す
 	auth0Token := r.Header.Get("X-Forwarded-Authorization")
 
+	token, err := jwt.Parse(r.Header.Get("X-Forwarded-Authorization"), func(token *jwt.Token) (interface{}, error) {
+		_, ok := token.Method.(*jwt.SigningMethodRSA)
+		if !ok {
+			//    writer.WriteHeader(http.StatusUnauthorized)
+			//    _, err := writer.Write([]byte("You're Unauthorized!"))
+			//    if err != nil {
+			// 	  return nil, err
+			//    }
+			log.Fatal("token not ok")
+		}
+		return "", nil
+	})
 	// 認証情報の検証
-	resp, err := verifyToken(auth0Token)
+	resp, err := verifyToken(token)
 	log.Println(resp)
 
 	// api2へのAuthorization Headerの引き渡し
