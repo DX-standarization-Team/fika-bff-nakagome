@@ -105,9 +105,9 @@ func getPemCert(token *jwt.Token) (string, error) {
 		log.Fatal("公開鍵を取得失敗")
 		return cert, err
 	}
-	defer resp.Body.Close()
 	log.Println("公開鍵を取得成功")
-	log.Println(resp.Body)
+	log.Println(resp)
+	defer resp.Body.Close()
 
 	var jwks = Jwks{}
 	err = json.NewDecoder(resp.Body).Decode(&jwks)
@@ -115,12 +115,15 @@ func getPemCert(token *jwt.Token) (string, error) {
 		return cert, err
 	}
 
+	log.Println("token.Header")
+	log.Println(token.Header["kid"])
 	for k, _ := range jwks.Keys {
 		if token.Header["kid"] == jwks.Keys[k].Kid {
 			cert = "-----BEGIN CERTIFICATE-----\n" + jwks.Keys[k].X5c[0] + "\n-----END CERTIFICATE-----"
 		}
 	}
 	if cert == "" {
+		log.Println("Unable to find appropriate key.")
 		err := errors.New("Unable to find appropriate key.")
 		return cert, err
 	}
