@@ -115,8 +115,7 @@
 // 		return cert, err
 // 	}
 
-// 	log.Println("token.Header")
-// 	log.Println(token.Header["kid"])
+// 	// token.Header["kid"] が nil となり、certもうまく取れない。
 // 	for k, _ := range jwks.Keys {
 // 		if token.Header["kid"] == jwks.Keys[k].Kid {
 // 			cert = "-----BEGIN CERTIFICATE-----\n" + jwks.Keys[k].X5c[0] + "\n-----END CERTIFICATE-----"
