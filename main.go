@@ -52,27 +52,27 @@ func workflowHandler(w http.ResponseWriter, r *http.Request) {
 	// Auth0の認証情報を取り出す
 	auth0Token := r.Header.Get("X-Forwarded-Authorization")
 	ctx := context.Background()
+
+	// Workflowアクセス用のクライアントライブラリを準備
 	client, err := executions.NewClient(ctx)
 	if err != nil {
-		fmt.Printf("executions.NewClient: %v\n", err)
-		// http.Error(w, fmt.Sprintf("...: %w", err), http.StatusInternalServerError)
+		http.Error(w, fmt.Sprintf("executions.NewClient failed...: %v", err), http.StatusInternalServerError)
 		return
 	}
 	defer client.Close()
 
+	// Workflowへ引数のauth0-tokenを指定してアクセス
 	req := &executionspb.CreateExecutionRequest{
 		Parent: "projects/" + ProjectId + "/locations/" + Location + "/workflows/" + workflowName,
 		Execution: &executionspb.Execution{
 			Argument: `{"auth0-token":"` + auth0Token + `"}`,
 		},
 	}
-
 	resp, err := client.CreateExecution(ctx, req)
 	if err != nil {
-		fmt.Printf("client.CreateExecution: %v\n", err)
-		// http.Error(w, fmt.Sprintf("...: %w", err), http.StatusInternalServerError)
+		http.Error(w, fmt.Sprintf("client.CreateExecution failed...: %v", err), http.StatusInternalServerError)
 	}
-	log.Println(resp)
+	w.WriteHeader(http.StatusOK)
 	fmt.Fprintf(w, "%v\n", resp)
 
 }
@@ -89,14 +89,10 @@ func api2Handler(w http.ResponseWriter, r *http.Request) {
 	client, err := idtoken.NewClient(ctx, Api2Url)
 	// TEST - idtoken.NewTokenSource : NG
 	// ts, err := idtoken.NewTokenSource(ctx, Api2Url)
-	if err != nil {
-		fmt.Printf("idtoken.NewClient: %v\n", err)
-		return
-	}
 	// TEST - NewTokenSource : NG
 	// token, err := ts.Token()
 	if err != nil {
-		// TODO: Handle error.
+		http.Error(w, fmt.Sprintf("idtoken.NewClient failed...: %v", err), http.StatusInternalServerError)
 	}
 	// req, _ := http.NewRequestWithContext(ctx, "GET", Api2Url, nil)
 	req, _ := http.NewRequest("GET", Api2Url, nil)
@@ -119,8 +115,9 @@ func api2Handler(w http.ResponseWriter, r *http.Request) {
 	// 	return
 	// }
 	defer resp.Body.Close()
+
 	// 取得したURLの内容を読み込む
 	body, _ := io.ReadAll(resp.Body)
-	log.Println(string(body))
+	w.WriteHeader(http.StatusOK)
 	fmt.Fprintf(w, "%s\n", string(body))
 }
