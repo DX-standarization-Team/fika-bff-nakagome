@@ -1,0 +1,123 @@
+// package main
+
+// import (
+// 	"context"
+// 	"fmt"
+// 	"io"
+// 	"log"
+// 	"net/http"
+// 	"os"
+
+// 	executions "cloud.google.com/go/workflows/executions/apiv1"
+// 	executionspb "cloud.google.com/go/workflows/executions/apiv1/executionspb"
+// 	"google.golang.org/api/idtoken"
+
+// 	"github.com/GoogleCloudPlatform/golang-samples/run/helloworld/middleware"
+// 	"github.com/joho/godotenv"
+// )
+
+// const Api1Url = "https://fika-api1-nakagome-wsgwmfbvhq-uc.a.run.app"
+// const Api2Url = "https://fika-api2-nakagome-wsgwmfbvhq-uc.a.run.app"
+// const workflowUrl = "https://fika-api2-nakagome-wsgwmfbvhq-uc.a.run.app"
+// const ProjectId = "kaigofika-poc01"
+// const Location = "us-central1"
+// const workflowName = "fs-workflow-nakagome"
+
+// func main() {
+// 	if err := godotenv.Load(); err != nil {
+// 		log.Fatalf("Error loading the .env file: %v", err)
+// 	}
+
+// 	router := http.NewServeMux()
+
+// 	http.HandleFunc("/workflow", workflowHandler)
+// 	// http.HandleFunc("/api2", api2Handler)
+// 	router.Handle("/api2", middleware.EnsureValidToken()(http.HandlerFunc(api2Handler)))
+
+// 	port := os.Getenv("PORT")
+// 	if port == "" {
+// 		port = "8080"
+// 	}
+// 	if err := http.ListenAndServe(":"+port, nil); err != nil {
+// 		log.Fatal(err)
+// 	}
+// }
+
+// // BFF → workflow → api2 呼び出し
+// func workflowHandler(w http.ResponseWriter, r *http.Request) {
+
+// 	// Auth0の認証情報を取り出す
+// 	auth0Token := r.Header.Get("X-Forwarded-Authorization")
+// 	ctx := context.Background()
+// 	client, err := executions.NewClient(ctx)
+// 	if err != nil {
+// 		fmt.Printf("executions.NewClient: %v\n", err)
+// 		// http.Error(w, fmt.Sprintf("...: %w", err), http.StatusInternalServerError)
+// 		return
+// 	}
+// 	defer client.Close()
+
+// 	req := &executionspb.CreateExecutionRequest{
+// 		Parent: "projects/" + ProjectId + "/locations/" + Location + "/workflows/" + workflowName,
+// 		Execution: &executionspb.Execution{
+// 			Argument: `{"auth0-token":"` + auth0Token + `"}`,
+// 		},
+// 	}
+
+// 	resp, err := client.CreateExecution(ctx, req)
+// 	if err != nil {
+// 		fmt.Printf("client.CreateExecution: %v\n", err)
+// 		// http.Error(w, fmt.Sprintf("...: %w", err), http.StatusInternalServerError)
+// 	}
+// 	log.Println(resp)
+// 	fmt.Fprintf(w, "%v\n", resp)
+
+// }
+
+// // BFF → api2 呼び出し
+// func api2Handler(w http.ResponseWriter, r *http.Request) {
+// 	// Auth0の認証情報をそのまま取り出す
+// 	auth0Token := r.Header.Get("X-Forwarded-Authorization")
+
+// 	// api2へのAuthorization Headerの引き渡し
+// 	ctx := context.Background()
+// 	// TEST - contextがhttpでうまくいかない
+// 	// ctx := context.WithValue(context.Background(), "auth0-token", auth0Token)
+// 	client, err := idtoken.NewClient(ctx, Api2Url)
+// 	// TEST - idtoken.NewTokenSource : NG
+// 	// ts, err := idtoken.NewTokenSource(ctx, Api2Url)
+// 	if err != nil {
+// 		fmt.Printf("idtoken.NewClient: %v\n", err)
+// 		return
+// 	}
+// 	// TEST - NewTokenSource : NG
+// 	// token, err := ts.Token()
+// 	if err != nil {
+// 		// TODO: Handle error.
+// 	}
+// 	// req, _ := http.NewRequestWithContext(ctx, "GET", Api2Url, nil)
+// 	req, _ := http.NewRequest("GET", Api2Url, nil)
+// 	// TEST - NewTokenSource : NG
+// 	// token.SetAuthHeader(req)
+// 	// TEST - WithContextでcontextを操作 → うまくいかない
+// 	// req = req.WithContext(ctx)
+// 	// header追加 → 上手くいく
+// 	req.Header.Set("auth0-token", auth0Token)
+// 	resp, err := client.Do(req)
+// 	if err != nil {
+// 		log.Fatalf("%v", err)
+// 	}
+
+// 	// TEST - NewTokenSource
+// 	// resp, err := client.Get(Api2Url)
+// 	// if err != nil {
+// 	// 	fmt.Printf("client.Get: %v\n", err)
+// 	// 	// http.Error(w, fmt.Sprintf("...: %w", err), http.StatusInternalServerError)
+// 	// 	return
+// 	// }
+// 	defer resp.Body.Close()
+// 	// 取得したURLの内容を読み込む
+// 	body, _ := io.ReadAll(resp.Body)
+// 	log.Println(string(body))
+// 	fmt.Fprintf(w, "%s\n", string(body))
+// }
