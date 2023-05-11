@@ -43,8 +43,10 @@ func EnsureValidToken() func(next http.Handler) http.Handler {
 	if err != nil {
 		log.Fatalf("Failed to parse the issuer url: %v", err)
 	}
+	log.Printf("Parsed issuerURL: %s", issuerURL)
 
 	provider := jwks.NewCachingProvider(issuerURL, 5*time.Minute)
+	log.Printf("provider: %v", provider)
 
 	jwtValidator, err := validator.New(
 		provider.KeyFunc,
@@ -52,16 +54,17 @@ func EnsureValidToken() func(next http.Handler) http.Handler {
 		issuerURL.String(),
 		[]string{"https://fs-apigw-bff-nakagome-bi5axj14.uc.gateway.dev/"},
 		// []string{os.Getenv("AUTH0_AUDIENCE")},
-		validator.WithCustomClaims(
-			func() validator.CustomClaims {
-				return &CustomClaims{}
-			},
-		),
+		// validator.WithCustomClaims(
+		// 	func() validator.CustomClaims {
+		// 		return &CustomClaims{}
+		// 	},
+		// ),
 		validator.WithAllowedClockSkew(time.Minute),
 	)
 	if err != nil {
 		log.Fatalf("Failed to set up the jwt validator")
 	}
+	log.Printf("jwtValidator: %v", jwtValidator)
 
 	errorHandler := func(w http.ResponseWriter, r *http.Request, err error) {
 		log.Printf("Encountered error while validating JWT: %v", err)
