@@ -67,7 +67,7 @@ func verifyToken(tokenString string) bool {
 	if err != nil {
 		log.Fatal("トークン取得失敗")
 	}
-	log.Printf("トークン取得: %v", token)
+	log.Printf("トークン取得： %v", token)
 
 	// 公開鍵取得
 	cert := ""
