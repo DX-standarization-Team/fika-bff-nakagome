@@ -30,14 +30,17 @@ func main() {
 
 	router := http.NewServeMux()
 
-	http.HandleFunc("/workflow", workflowHandler)
+	// http.HandleFunc("/workflow", workflowHandler)
 	// http.HandleFunc("/api2", api2Handler)
+	router.Handle("/workflow", http.HandlerFunc(workflowHandler))
 	router.Handle("/api2", middleware.EnsureValidToken()(http.HandlerFunc(api2Handler)))
 
 	port := os.Getenv("PORT")
 	if port == "" {
+		log.Printf("os.Getenv(PORT) was blank. so we will push push 8080")
 		port = "8080"
 	}
+	log.Print("Server listening on http://localhost:8080")
 	if err := http.ListenAndServe(":"+port, router); err != nil {
 		log.Fatalf("There was an error with the http server: %v", err)
 	}
