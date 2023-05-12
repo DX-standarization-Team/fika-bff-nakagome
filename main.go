@@ -7,6 +7,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"regexp"
 
 	executions "cloud.google.com/go/workflows/executions/apiv1"
 	executionspb "cloud.google.com/go/workflows/executions/apiv1/executionspb"
@@ -114,7 +115,7 @@ func verifyToken(tokenString string) bool {
 		// return []byte("SECRET_KEY"), nil
 	})
 	if err != nil {
-		log.Fatalln("Failed to Parse the token: %v", err)
+		log.Fatalf("Failed to Parse the token: %v", err)
 	}
 
 	log.Printf("token.Valid: %v", token.Valid)
@@ -173,6 +174,9 @@ func workflowHandler(w http.ResponseWriter, r *http.Request) {
 func api2Handler(w http.ResponseWriter, r *http.Request) {
 	// Auth0の認証情報をそのまま取り出す
 	auth0Token := r.Header.Get("X-Forwarded-Authorization")
+
+	rep := regexp.MustCompile(`Bearer `)
+	auth0Token = rep.ReplaceAllString(auth0Token, "")
 
 	log.Printf("calling verifyToken tokenString: %v", auth0Token)
 	result := verifyToken(auth0Token)
