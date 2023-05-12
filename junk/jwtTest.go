@@ -221,3 +221,11 @@
 // 	log.Println(string(body))
 // 	fmt.Fprintf(w, "%s\n", string(body))
 // }
+
+// if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
+// 	fmt.Printf("claims %v\n", claims)
+// 	// fmt.Printf("user_id: %v\n", int64(claims["user_id"].(float64)))
+// 	fmt.Printf("exp: %v\n", int64(claims["exp"].(float64)))
+// } else {
+// 	fmt.Println(err)
+// }

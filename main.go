@@ -2,11 +2,13 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"io"
 	"log"
 	"net/http"
 	"os"
+	"regexp"
 
 	executions "cloud.google.com/go/workflows/executions/apiv1"
 	executionspb "cloud.google.com/go/workflows/executions/apiv1/executionspb"
@@ -23,13 +25,10 @@ const Location = "us-central1"
 const workflowName = "fs-workflow-nakagome"
 
 const Audience = "https://fs-apigw-bff-nakagome-bi5axj14.uc.gateway.dev/"
+const Audience2 = "https://dev-kjqwuq76z8suldgw.us.auth0.com/userinfo"
 const DomainName = "dev-kjqwuq76z8suldgw.us.auth0.com"
 
-const x5c = "MIIDHTCCAgWgAwIBAgIJUza6LlfdwHcMMA0GCSqGSIb3DQEBCwUAMCwxKjAoBgNVBAMTIWRldi1ranF3dXE3Nno4c3VsZGd3LnVzLmF1dGgwLmNvbTAeFw0yMzA0MDUwMTMyMjZaFw0zNjEyMTIwMTMyMjZaMCwxKjAoBgNVBAMTIWRldi1ranF3dXE3Nno4c3VsZGd3LnVzLmF1dGgwLmNvbTCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBALXh3e5tIsKGBozE6eMFqiEb1bHp65QBOBldOuM2SK4a5+AVVENfO+1Y6LTW/JqfOH+tPP7XDImcA/n1Tm/0uNOpVUdwWPwHqCwUz692/Tn6W/MlLdwKSuMh8hV24eb6wZAbeCcNehiqD3I0eaMyNE1fSx0eqdjUNCFLckDzAfAhaUQv3kF6yrq+i7yPQrXf4Zn1C0IQY3LPODL293F8mVFJgSEEMmtlFLMbJL1o2Q2GW0gSqM6Q6g2bHA//Gv2zrArePGlNCdATaWr2mqG2Y7Hc4L1eWtuKlyUPZI+jyqJl+m6PJrwBYTZm9pKiMaDGXlRYGgQCJe5TIFl0+41GaJkCAwEAAaNCMEAwDwYDVR0TAQH/BAUwAwEB/zAdBgNVHQ4EFgQUpCa5Y1PrnGqHsDXJcLB7l/lD47gwDgYDVR0PAQH/BAQDAgKEMA0GCSqGSIb3DQEBCwUAA4IBAQCdHir2MQJ4bklAMiouvuhX+WlSK+xpCGUjYHyaA+sf7/BaDCjaCWVa40GyH0bzT/k0hCy9TrihHqzgH3z6Y0ty7oWZlQZs65xfkQr7v9wKfH5B28mcyxBVTTmJLLZGj2LCByZHUipKWmv9iCCMsU7pM2VsUTWwGwhmxizxtKpMOtynwwUdD8xtpsF6WfyBwSfUSaaldnx3I719NFjC0Ph0ieuzPdevrGQJ6AE7l0HxSvd81MJLg52HdB+vWiwVVjf985AUNpdORE+APfxAR010TU4zpjAq8sd3aeRqdycqlMJGbIMzjPzG4EDIQtshhX2Ki0Z7FpQa8WA3WDMJy9Mz"
-
 func main() {
-
-	// router := http.NewServeMux()
 
 	http.HandleFunc("/workflow", workflowHandler)
 	http.HandleFunc("/api2", api2Handler)
@@ -57,81 +56,80 @@ type JSONWebKeys struct {
 	N   string   `json:"n"`
 	E   string   `json:"e"`
 	X5c []string `json:"x5c"`
-	X5t []string `json:"x5t"`
 }
 
 func verifyToken(tokenString string) bool {
-	log.Printf("verifyToken entering tokenString: %v", tokenString)
 
-	// トークンを解析
-	// token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
-	// 	return []byte("AllYourBase"), nil
-	// })
-	// if err != nil {
-	// 	log.Fatal("Failed to retrieve the token")
-	// }
-	// log.Printf("Succeeded to retrieve the token %v", token)
-
-	// jwt.SigningMethodRS256.Verify()
-
+	// Parse and validate, and returns a token
 	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
 		// Don't forget to validate the alg is what you expect:
 		if _, ok := token.Method.(*jwt.SigningMethodRSA); !ok {
 			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
 		}
 		// https://github.com/dgrijalva/jwt-go/issues/438 参考
-		// JSON Web Key Set取得
-		// cert := ""
-		// log.Println("get certificate")
-		// resp, err := http.Get("https://" + DomainName + "/.well-known/jwks.json")
-		// if err != nil {
-		// 	log.Fatal("failed to get certificate")
-		// }
-		// log.Println("succeeded to get certificate")
-		// defer resp.Body.Close()
-		// var jwks = Jwks{}
-		// err = json.NewDecoder(resp.Body).Decode(&jwks)
-		// if err != nil {
-		// 	log.Fatal("feiled to decode the certificate")
-		// }
-		// log.Printf("jwks: %v", jwks)
-		// for k, _ := range jwks.Keys {
-		// 	if token.Header["kid"] == jwks.Keys[k].Kid {
-		// 		cert = "-----BEGIN CERTIFICATE-----\n" + jwks.Keys[k].X5c[0] + "\n-----END CERTIFICATE-----"
-		// 	}
-		// }
-		// if cert == "" {
-		// 	log.Fatalf("Unable to find appropriate key.")
-		// }
-		cert := "-----BEGIN CERTIFICATE-----\n" + x5c + "\n-----END CERTIFICATE-----"
-
+		// get certificate from JSON Web Key Set from Auth0
+		cert := ""
+		resp, err := http.Get("https://" + DomainName + "/.well-known/jwks.json")
+		if err != nil {
+			log.Printf("failed to get certificate: resp.Status: %v, err: %v", resp.Status, err)
+		}
+		log.Println("succeeded to get certificate")
+		defer resp.Body.Close()
+		// convert response into Jwks structure
+		var jwks = Jwks{}
+		err = json.NewDecoder(resp.Body).Decode(&jwks)
+		if err != nil {
+			log.Printf("failed to decode the certificate: %v", err)
+		}
+		log.Printf("jwks: %v", jwks)
+		// find an appropriate certificate
+		for k, _ := range jwks.Keys {
+			if token.Header["kid"] == jwks.Keys[k].Kid {
+				cert = "-----BEGIN CERTIFICATE-----\n" + jwks.Keys[k].X5c[0] + "\n-----END CERTIFICATE-----"
+			}
+		}
+		log.Printf("cert: %v", cert)
+		if cert == "" {
+			log.Printf("Unable to find appropriate key.")
+		}
+		// get a RSA public key from the certificate
 		result, _ := jwt.ParseRSAPublicKeyFromPEM([]byte(cert))
-		return result, nil // returns *rsa.publicKey
-		// return []byte("SECRET_KEY"), nil
+		log.Printf("result: %v", result)
+		// returns *rsa.publicKey in case of rsa
+		return result, nil
 	})
 	if err != nil {
-		log.Fatalln("Failed to Parse the token")
+		log.Printf("Failed to Parse the token: %v", err)
 	}
 
+	// 取得したトークンで検証
 	log.Printf("token.Valid: %v", token.Valid)
-	// confirm each claim
 	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
-		log.Printf("aud: %v\n", claims["aud"])
-		log.Printf("exp: %v\n", int64(claims["exp"].(float64)))
+		// confirm audience
+		log.Printf("aud: %v", claims["aud"])
 	} else {
-		log.Println(err)
+		fmt.Println(err)
 	}
 
-	log.Println("verifyToken exiting")
+	if !token.Valid {
+		log.Printf("Invalid token.")
+	} else {
+		// confirm each audience
+		iss := "https://" + DomainName + "/"
+		checkIss := token.Claims.(jwt.MapClaims).VerifyIssuer(iss, true)
+		if !checkIss {
+			log.Printf("Invalid isssuer.")
+		}
+		log.Printf("Check isssuer: %v", checkIss)
+		checkAud := token.Claims.(jwt.MapClaims).VerifyAudience(Audience, true)
+		if !checkAud {
+			log.Printf("Invalid audience.")
+		}
+		log.Printf("Check audience: %v", checkAud)
+	}
+
 	return token.Valid
 
-	// if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
-	// 	fmt.Printf("claims %v\n", claims)
-	// 	// fmt.Printf("user_id: %v\n", int64(claims["user_id"].(float64)))
-	// 	fmt.Printf("exp: %v\n", int64(claims["exp"].(float64)))
-	// } else {
-	// 	fmt.Println(err)
-	// }
 }
 
 // BFF → workflow → api2 呼び出し
@@ -167,12 +165,17 @@ func workflowHandler(w http.ResponseWriter, r *http.Request) {
 
 // BFF → api2 呼び出し
 func api2Handler(w http.ResponseWriter, r *http.Request) {
-	// Auth0の認証情報をそのまま取り出す
+	// extract auth0 Bearer token
 	auth0Token := r.Header.Get("X-Forwarded-Authorization")
-
-	log.Printf("calling verifyToken tokenString: %v", auth0Token)
+	// remove token から 'Beaere '文字列を取り除く
+	rep := regexp.MustCompile(`Bearer `)
+	auth0Token = rep.ReplaceAllString(auth0Token, "")
+	// トークンの検証
 	result := verifyToken(auth0Token)
 	log.Printf("verifyToekn result: %v", result)
+	if !result {
+		log.Fatal("Token verification failed.")
+	}
 
 	// api2へのAuthorization Headerの引き渡し
 	ctx := context.Background()
