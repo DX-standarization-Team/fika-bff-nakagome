@@ -21,7 +21,7 @@ const ProjectId = "kaigofika-poc01"
 const Location = "us-central1"
 const workflowName = "fs-workflow-nakagome"
 
-// New sets up our routes and returns a *http.ServeMux.
+// New sets up our routes and returns a *http.ServeMux
 func New() *http.ServeMux {
 	router := http.NewServeMux()
 
