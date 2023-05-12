@@ -69,14 +69,14 @@ func verifyToken(tokenString string) bool {
 	}
 	log.Printf("トークン取得： %v", token)
 
-	// 公開鍵取得
+	// JSON Web Key Set取得
 	cert := ""
 	resp, err := http.Get("https://" + DomainName + "/.well-known/jwks.json")
 	if err != nil {
-		log.Fatal("公開鍵を取得失敗")
+		log.Fatal("getting certificate failed")
 		// return cert, err
 	}
-	log.Println("公開鍵を取得成功")
+	log.Println("getting certificate succeeded")
 	log.Println(resp)
 	defer resp.Body.Close()
 	var jwks = Jwks{}
@@ -95,7 +95,7 @@ func verifyToken(tokenString string) bool {
 
 	result, _ := jwt.ParseRSAPublicKeyFromPEM([]byte(cert))
 	log.Println("verifyToken exiting")
-	jwt.SigningMethodRS256.Verify()
+	// jwt.SigningMethodRS256.Verify()
 
 	token2, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
 		// Don't forget to validate the alg is what you expect:
