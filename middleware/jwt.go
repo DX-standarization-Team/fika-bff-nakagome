@@ -5,10 +5,7 @@ import (
 	"net/http"
 	"net/url"
 
-	"strings"
 	"time"
-
-	"github.com/pkg/errors"
 
 	jwtmiddleware "github.com/auth0/go-jwt-middleware/v2"
 	"github.com/auth0/go-jwt-middleware/v2/jwks"
@@ -84,27 +81,12 @@ func EnsureValidToken() func(next http.Handler) http.Handler {
 	middleware := jwtmiddleware.New(
 		jwtValidator.ValidateToken,
 		jwtmiddleware.WithErrorHandler(errorHandler),
-		jwtmiddleware.WithTokenExtractor(AuthHeaderTokenExtractor),
+		// 以下メソッドはクエリの文字列から抽出する際の指定方法であったためNG
+		// jwtmiddleware.WithTokenExtractor(jwtmiddleware.ParameterTokenExtractor("X-Forwarded-Authorization")),
 	)
 
 	return func(next http.Handler) http.Handler {
 		log.Printf("middleware.CheckJWT starts")
 		return middleware.CheckJWT(next)
 	}
-}
-
-func AuthHeaderTokenExtractor(r *http.Request) (string, error) {
-	log.Printf("自作AuthHeaderTokenExtractor")
-	// authHeader := r.Header.Get("Authorization")
-	authHeader := r.Header.Get("X-Forwarded-Authorization")
-	if authHeader == "" {
-		return "", nil // No error, just no JWT.
-	}
-
-	authHeaderParts := strings.Fields(authHeader)
-	if len(authHeaderParts) != 2 || strings.ToLower(authHeaderParts[0]) != "bearer" {
-		return "", errors.New("Authorization header format must be Bearer {token}")
-	}
-	log.Printf("自作AuthHeaderTokenExtractor exiting : %v", authHeaderParts[1])
-	return authHeaderParts[1], nil
 }
