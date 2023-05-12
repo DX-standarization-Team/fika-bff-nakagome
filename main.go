@@ -70,7 +70,7 @@ func verifyToken(tokenString string) bool {
 		cert := ""
 		resp, err := http.Get("https://" + DomainName + "/.well-known/jwks.json")
 		if err != nil {
-			log.Fatalf("failed to get certificate: resp.Status: %v, err: %v", resp.Status, err)
+			log.Printf("failed to get certificate: resp.Status: %v, err: %v", resp.Status, err)
 		}
 		log.Println("succeeded to get certificate")
 		defer resp.Body.Close()
@@ -78,7 +78,7 @@ func verifyToken(tokenString string) bool {
 		var jwks = Jwks{}
 		err = json.NewDecoder(resp.Body).Decode(&jwks)
 		if err != nil {
-			log.Fatalf("failed to decode the certificate: %v", err)
+			log.Printf("failed to decode the certificate: %v", err)
 		}
 		log.Printf("jwks: %v", jwks)
 		// find an appropriate certificate
@@ -89,7 +89,7 @@ func verifyToken(tokenString string) bool {
 		}
 		log.Printf("cert: %v", cert)
 		if cert == "" {
-			log.Fatalf("Unable to find appropriate key.")
+			log.Printf("Unable to find appropriate key.")
 		}
 		// get a RSA public key from the certificate
 		result, _ := jwt.ParseRSAPublicKeyFromPEM([]byte(cert))
@@ -98,7 +98,7 @@ func verifyToken(tokenString string) bool {
 		return result, nil
 	})
 	if err != nil {
-		log.Fatalf("Failed to Parse the token: %v", err)
+		log.Printf("Failed to Parse the token: %v", err)
 	}
 
 	log.Printf("token.Valid: %v", token.Valid)
