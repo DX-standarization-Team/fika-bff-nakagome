@@ -47,7 +47,6 @@ func EnsureValidToken() func(next http.Handler) http.Handler {
 
 	provider := jwks.NewCachingProvider(issuerURL, 5*time.Minute)
 	log.Printf("provider: %v", provider)
-
 	jwtValidator, err := validator.New(
 		provider.KeyFunc,
 		validator.RS256,
@@ -77,6 +76,7 @@ func EnsureValidToken() func(next http.Handler) http.Handler {
 	middleware := jwtmiddleware.New(
 		jwtValidator.ValidateToken,
 		jwtmiddleware.WithErrorHandler(errorHandler),
+		jwtmiddleware.WithTokenExtractor(jwtmiddleware.ParameterTokenExtractor("X-Forwarded-Authorization")),
 	)
 
 	return func(next http.Handler) http.Handler {
