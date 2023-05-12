@@ -61,53 +61,62 @@ type JSONWebKeys struct {
 func verifyToken(tokenString string) bool {
 
 	// トークンを解析
-	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
-		return []byte("AllYourBase"), nil
-	})
-	if err != nil {
-		log.Fatal("トークン取得失敗")
-	}
-	log.Printf("トークン取得： %v", token)
+	// token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
+	// 	return []byte("AllYourBase"), nil
+	// })
+	// if err != nil {
+	// 	log.Fatal("Failed to retrieve the token")
+	// }
+	// log.Printf("Succeeded to retrieve the token %v", token)
 
-	// JSON Web Key Set取得
-	cert := ""
-	resp, err := http.Get("https://" + DomainName + "/.well-known/jwks.json")
-	if err != nil {
-		log.Fatal("getting certificate failed")
-		// return cert, err
-	}
-	log.Println("getting certificate succeeded")
-	log.Println(resp)
-	defer resp.Body.Close()
-	var jwks = Jwks{}
-	err = json.NewDecoder(resp.Body).Decode(&jwks)
-	if err != nil {
-		// return cert, err
-	}
-	for k, _ := range jwks.Keys {
-		if token.Header["kid"] == jwks.Keys[k].Kid {
-			cert = "-----BEGIN CERTIFICATE-----\n" + jwks.Keys[k].X5c[0] + "\n-----END CERTIFICATE-----"
-		}
-	}
-	if cert == "" {
-		log.Fatalf("Unable to find appropriate key.")
-	}
-
-	result, _ := jwt.ParseRSAPublicKeyFromPEM([]byte(cert))
-	log.Println("verifyToken exiting")
 	// jwt.SigningMethodRS256.Verify()
 
-	token2, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
+	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
 		// Don't forget to validate the alg is what you expect:
 		if _, ok := token.Method.(*jwt.SigningMethodRSA); !ok {
 			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
 		}
-		// return []byte("SECRET_KEY"), nil
+		// untypedKid, found := token.Header["kid"]
+		// if !found {
+		// 	log.Fatalf("No key ID key '%v' found in token header", "kid")
+		// }
+		// keyId, ok := untypedKid.(string)
+		// if !ok {
+		// 	log.Fatalf("Found key ID, but value was not a string")
+		// }
+		// JSON Web Key Set取得
+		cert := ""
+		resp, err := http.Get("https://" + DomainName + "/.well-known/jwks.json")
+		if err != nil {
+			log.Fatal("failed to get certificate")
+		}
+		log.Println("succeeded to get certificate")
+		defer resp.Body.Close()
+		var jwks = Jwks{}
+		err = json.NewDecoder(resp.Body).Decode(&jwks)
+		if err != nil {
+			log.Fatal("feiled to decode the certificate")
+		}
+		log.Printf("jwks: %v", jwks)
+		for k, _ := range jwks.Keys {
+			if token.Header["kid"] == jwks.Keys[k].Kid {
+				cert = "-----BEGIN CERTIFICATE-----\n" + jwks.Keys[k].X5c[0] + "\n-----END CERTIFICATE-----"
+			}
+		}
+		if cert == "" {
+			log.Fatalf("Unable to find appropriate key.")
+		}
+		result, _ := jwt.ParseRSAPublicKeyFromPEM([]byte(cert))
 		return result, nil
+		// return []byte("SECRET_KEY"), nil
 	})
+	if err != nil {
+		log.Fatalln("Failed to Parse the token")
+	}
 
-	log.Println(token2.Valid)
-	return token2.Valid
+	log.Printf("token.Valid: %v", token.Valid)
+	log.Println("verifyToken exiting")
+	return token.Valid
 
 	// if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
 	// 	fmt.Printf("claims %v\n", claims)
@@ -153,7 +162,10 @@ func workflowHandler(w http.ResponseWriter, r *http.Request) {
 func api2Handler(w http.ResponseWriter, r *http.Request) {
 	// Auth0の認証情報をそのまま取り出す
 	auth0Token := r.Header.Get("X-Forwarded-Authorization")
-	verifyToken(auth0Token)
+
+	result := verifyToken(auth0Token)
+	log.Printf("verifyToekn result: %v", result)
+
 	// api2へのAuthorization Headerの引き渡し
 	ctx := context.Background()
 	client, err := idtoken.NewClient(ctx, Api2Url)
