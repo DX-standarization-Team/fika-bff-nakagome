@@ -59,7 +59,7 @@ type JSONWebKeys struct {
 }
 
 func verifyToken(tokenString string) bool {
-	log.Printf("verifyToken entering")
+	log.Printf("verifyToken entering tokenString: %v", tokenString)
 
 	// トークンを解析
 	// token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
