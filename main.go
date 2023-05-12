@@ -79,6 +79,9 @@ func verifyToken(tokenString string) bool {
 		if _, ok := token.Method.(*jwt.SigningMethodRSA); !ok {
 			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
 		}
+		log.Printf("token: %v", token)
+		log.Printf("token.Header: %v", token.Header)
+		log.Printf("token.Claims: %v", token.Claims)
 		// https://github.com/dgrijalva/jwt-go/issues/438 参考
 		// JSON Web Key Set取得
 		// cert := ""
@@ -106,11 +109,12 @@ func verifyToken(tokenString string) bool {
 		cert := "-----BEGIN CERTIFICATE-----\n" + x5c + "\n-----END CERTIFICATE-----"
 
 		result, _ := jwt.ParseRSAPublicKeyFromPEM([]byte(cert))
+		log.Printf("result: %v", result)
 		return result, nil // returns *rsa.publicKey
 		// return []byte("SECRET_KEY"), nil
 	})
 	if err != nil {
-		log.Fatalln("Failed to Parse the token")
+		log.Fatalln("Failed to Parse the token: %v", err)
 	}
 
 	log.Printf("token.Valid: %v", token.Valid)
