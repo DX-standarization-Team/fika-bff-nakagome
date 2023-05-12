@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
@@ -53,13 +54,14 @@ type Jwks struct {
 }
 
 type JSONWebKeys struct {
+	Alg string   `json:"alg"`
 	Kty string   `json:"kty"`
 	Kid string   `json:"kid"`
 	Use string   `json:"use"`
 	N   string   `json:"n"`
 	E   string   `json:"e"`
 	X5c []string `json:"x5c"`
-	X5t []string `json:"x5t"`
+	X5t string   `json:"x5t"`
 }
 
 func verifyToken(tokenString string) bool {
@@ -83,6 +85,13 @@ func verifyToken(tokenString string) bool {
 		}
 		log.Println("succeeded to get certificate")
 		defer resp.Body.Close()
+		// レスポンスボディの読み込み
+		body, err := ioutil.ReadAll(resp.Body)
+		if err != nil {
+			log.Fatalf("read resp failed: %v", err)
+		}
+		log.Printf("resp.body: %v", string(body))
+
 		// convert into Jwks structure
 		var jwks = Jwks{}
 		err = json.NewDecoder(resp.Body).Decode(&jwks)
@@ -103,8 +112,8 @@ func verifyToken(tokenString string) bool {
 
 		result, _ := jwt.ParseRSAPublicKeyFromPEM([]byte(cert))
 		log.Printf("result: %v", result)
-		return result, nil // returns *rsa.publicKey
-		// return []byte("SECRET_KEY"), nil
+		// returns *rsa.publicKey in case of rsa
+		return result, nil
 	})
 	if err != nil {
 		log.Fatalf("Failed to Parse the token: %v", err)
