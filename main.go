@@ -54,14 +54,12 @@ type Jwks struct {
 }
 
 type JSONWebKeys struct {
-	Alg string   `json:"alg"`
 	Kty string   `json:"kty"`
 	Kid string   `json:"kid"`
 	Use string   `json:"use"`
 	N   string   `json:"n"`
 	E   string   `json:"e"`
 	X5c []string `json:"x5c"`
-	X5t string   `json:"x5t"`
 }
 
 func verifyToken(tokenString string) bool {
@@ -96,7 +94,7 @@ func verifyToken(tokenString string) bool {
 		var jwks = Jwks{}
 		err = json.NewDecoder(resp.Body).Decode(&jwks)
 		if err != nil {
-			log.Fatal("feiled to decode the certificate")
+			log.Fatalf("failed to decode the certificate: %v", err)
 		}
 		log.Printf("jwks: %v", jwks)
 		for k, _ := range jwks.Keys {
