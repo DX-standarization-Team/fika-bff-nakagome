@@ -30,8 +30,9 @@ type JSONWebKeys struct {
 // EnsureValidToken is a middleware that will check the validity of our JWT.
 func JWTAuthMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		// Auth0のトークンを取得
 		auth0Token := r.Header.Get("X-Forwarded-Authorization")
-		// remove token から 'Beaere '文字列を取り除く
+		// トークンから'Beaere '文字列を取り除く
 		rep := regexp.MustCompile(`Bearer `)
 		auth0Token = rep.ReplaceAllString(auth0Token, "")
 		// トークンの検証
