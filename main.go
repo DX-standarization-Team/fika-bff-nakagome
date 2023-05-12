@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"io"
 	"log"
@@ -25,6 +24,8 @@ const workflowName = "fs-workflow-nakagome"
 
 const Audience = "https://fs-apigw-bff-nakagome-bi5axj14.uc.gateway.dev/"
 const DomainName = "dev-kjqwuq76z8suldgw.us.auth0.com"
+
+const x5c = "MIIDHTCCAgWgAwIBAgIJUza6LlfdwHcMMA0GCSqGSIb3DQEBCwUAMCwxKjAoBgNVBAMTIWRldi1ranF3dXE3Nno4c3VsZGd3LnVzLmF1dGgwLmNvbTAeFw0yMzA0MDUwMTMyMjZaFw0zNjEyMTIwMTMyMjZaMCwxKjAoBgNVBAMTIWRldi1ranF3dXE3Nno4c3VsZGd3LnVzLmF1dGgwLmNvbTCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBALXh3e5tIsKGBozE6eMFqiEb1bHp65QBOBldOuM2SK4a5+AVVENfO+1Y6LTW/JqfOH+tPP7XDImcA/n1Tm/0uNOpVUdwWPwHqCwUz692/Tn6W/MlLdwKSuMh8hV24eb6wZAbeCcNehiqD3I0eaMyNE1fSx0eqdjUNCFLckDzAfAhaUQv3kF6yrq+i7yPQrXf4Zn1C0IQY3LPODL293F8mVFJgSEEMmtlFLMbJL1o2Q2GW0gSqM6Q6g2bHA//Gv2zrArePGlNCdATaWr2mqG2Y7Hc4L1eWtuKlyUPZI+jyqJl+m6PJrwBYTZm9pKiMaDGXlRYGgQCJe5TIFl0+41GaJkCAwEAAaNCMEAwDwYDVR0TAQH/BAUwAwEB/zAdBgNVHQ4EFgQUpCa5Y1PrnGqHsDXJcLB7l/lD47gwDgYDVR0PAQH/BAQDAgKEMA0GCSqGSIb3DQEBCwUAA4IBAQCdHir2MQJ4bklAMiouvuhX+WlSK+xpCGUjYHyaA+sf7/BaDCjaCWVa40GyH0bzT/k0hCy9TrihHqzgH3z6Y0ty7oWZlQZs65xfkQr7v9wKfH5B28mcyxBVTTmJLLZGj2LCByZHUipKWmv9iCCMsU7pM2VsUTWwGwhmxizxtKpMOtynwwUdD8xtpsF6WfyBwSfUSaaldnx3I719NFjC0Ph0ieuzPdevrGQJ6AE7l0HxSvd81MJLg52HdB+vWiwVVjf985AUNpdORE+APfxAR010TU4zpjAq8sd3aeRqdycqlMJGbIMzjPzG4EDIQtshhX2Ki0Z7FpQa8WA3WDMJy9Mz"
 
 func main() {
 
@@ -79,28 +80,30 @@ func verifyToken(tokenString string) bool {
 		}
 		// https://github.com/dgrijalva/jwt-go/issues/438 参考
 		// JSON Web Key Set取得
-		cert := ""
-		log.Println("get certificate")
-		resp, err := http.Get("https://" + DomainName + "/.well-known/jwks.json")
-		if err != nil {
-			log.Fatal("failed to get certificate")
-		}
-		log.Println("succeeded to get certificate")
-		defer resp.Body.Close()
-		var jwks = Jwks{}
-		err = json.NewDecoder(resp.Body).Decode(&jwks)
-		if err != nil {
-			log.Fatal("feiled to decode the certificate")
-		}
-		log.Printf("jwks: %v", jwks)
-		for k, _ := range jwks.Keys {
-			if token.Header["kid"] == jwks.Keys[k].Kid {
-				cert = "-----BEGIN CERTIFICATE-----\n" + jwks.Keys[k].X5c[0] + "\n-----END CERTIFICATE-----"
-			}
-		}
-		if cert == "" {
-			log.Fatalf("Unable to find appropriate key.")
-		}
+		// cert := ""
+		// log.Println("get certificate")
+		// resp, err := http.Get("https://" + DomainName + "/.well-known/jwks.json")
+		// if err != nil {
+		// 	log.Fatal("failed to get certificate")
+		// }
+		// log.Println("succeeded to get certificate")
+		// defer resp.Body.Close()
+		// var jwks = Jwks{}
+		// err = json.NewDecoder(resp.Body).Decode(&jwks)
+		// if err != nil {
+		// 	log.Fatal("feiled to decode the certificate")
+		// }
+		// log.Printf("jwks: %v", jwks)
+		// for k, _ := range jwks.Keys {
+		// 	if token.Header["kid"] == jwks.Keys[k].Kid {
+		// 		cert = "-----BEGIN CERTIFICATE-----\n" + jwks.Keys[k].X5c[0] + "\n-----END CERTIFICATE-----"
+		// 	}
+		// }
+		// if cert == "" {
+		// 	log.Fatalf("Unable to find appropriate key.")
+		// }
+		cert := "-----BEGIN CERTIFICATE-----\n" + x5c + "\n-----END CERTIFICATE-----"
+
 		result, _ := jwt.ParseRSAPublicKeyFromPEM([]byte(cert))
 		return result, nil
 		// return []byte("SECRET_KEY"), nil
@@ -166,6 +169,7 @@ func api2Handler(w http.ResponseWriter, r *http.Request) {
 	// Auth0の認証情報をそのまま取り出す
 	auth0Token := r.Header.Get("X-Forwarded-Authorization")
 
+	log.Printf("calling verifyToken tokenString: %v", auth0Token)
 	result := verifyToken(auth0Token)
 	log.Printf("verifyToekn result: %v", result)
 
