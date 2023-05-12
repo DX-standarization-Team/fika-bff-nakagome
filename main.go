@@ -103,18 +103,18 @@ func verifyToken(tokenString string) bool {
 
 	log.Printf("token.Valid: %v", token.Valid)
 	if !token.Valid {
-		log.Fatalf("Invalid token.")
+		log.Printf("Invalid token.")
 	} else {
 		// confirm each claim
 		iss := "https://" + DomainName + "/"
 		checkIss := token.Claims.(jwt.MapClaims).VerifyIssuer(iss, true)
 		if !checkIss {
-			log.Fatalf("Invalid isssuer.")
+			log.Printf("Invalid isssuer.")
 		}
 		log.Printf("Check isssuer: %v", checkIss)
 		checkAud := token.Claims.(jwt.MapClaims).VerifyAudience(Audience, true)
 		if !checkAud {
-			log.Fatalf("Invalid audience.")
+			log.Printf("Invalid audience.")
 		}
 		log.Printf("Check audience: %v", checkAud)
 	}
