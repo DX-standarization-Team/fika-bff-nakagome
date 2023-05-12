@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
@@ -84,11 +83,11 @@ func verifyToken(tokenString string) bool {
 		log.Println("succeeded to get certificate")
 		defer resp.Body.Close()
 		// レスポンスボディの読み込み
-		body, err := ioutil.ReadAll(resp.Body)
-		if err != nil {
-			log.Fatalf("read resp failed: %v", err)
-		}
-		log.Printf("resp.body: %v", string(body))
+		// body, err := ioutil.ReadAll(resp.Body)
+		// if err != nil {
+		// 	log.Fatalf("read resp failed: %v", err)
+		// }
+		// log.Printf("resp.body: %v", string(body))
 
 		// convert into Jwks structure
 		var jwks = Jwks{}
