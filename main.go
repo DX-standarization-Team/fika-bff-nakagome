@@ -59,6 +59,7 @@ type JSONWebKeys struct {
 }
 
 func verifyToken(tokenString string) bool {
+	log.Printf("verifyToken entering")
 
 	// トークンを解析
 	// token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
@@ -76,16 +77,10 @@ func verifyToken(tokenString string) bool {
 		if _, ok := token.Method.(*jwt.SigningMethodRSA); !ok {
 			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
 		}
-		// untypedKid, found := token.Header["kid"]
-		// if !found {
-		// 	log.Fatalf("No key ID key '%v' found in token header", "kid")
-		// }
-		// keyId, ok := untypedKid.(string)
-		// if !ok {
-		// 	log.Fatalf("Found key ID, but value was not a string")
-		// }
+		// https://github.com/dgrijalva/jwt-go/issues/438 参考
 		// JSON Web Key Set取得
 		cert := ""
+		log.Println("get certificate")
 		resp, err := http.Get("https://" + DomainName + "/.well-known/jwks.json")
 		if err != nil {
 			log.Fatal("failed to get certificate")
@@ -115,6 +110,14 @@ func verifyToken(tokenString string) bool {
 	}
 
 	log.Printf("token.Valid: %v", token.Valid)
+	// confirm each claim
+	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
+		log.Printf("aud: %v\n", claims["aud"])
+		log.Printf("exp: %v\n", int64(claims["exp"].(float64)))
+	} else {
+		log.Println(err)
+	}
+
 	log.Println("verifyToken exiting")
 	return token.Valid
 
