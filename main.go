@@ -100,29 +100,27 @@ func verifyToken(tokenString string) bool {
 	if err != nil {
 		log.Fatalf("Failed to Parse the token: %v", err)
 	}
-	// confirm each claim
-	iss := "https://" + DomainName + "/"
-	checkIss := token.Claims.(jwt.MapClaims).VerifyIssuer(iss, true)
-	if !checkIss {
-		log.Fatalf("Invalid isssuer.")
-	}
-	log.Printf("Check isssuer: %v", checkIss)
-	checkAud := token.Claims.(jwt.MapClaims).VerifyAudience(Audience, true)
-	if !checkAud {
-		log.Fatalf("Invalid audience.")
-	}
-	log.Printf("Check audience: %v", checkAud)
 
-	log.Printf("verifyToken exiting. token.Valid: %v", token.Valid)
-	return token.Valid && checkIss && checkAud
+	log.Printf("token.Valid: %v", token.Valid)
+	if !token.Valid {
+		log.Fatalf("Invalid token.")
+	} else {
+		// confirm each claim
+		iss := "https://" + DomainName + "/"
+		checkIss := token.Claims.(jwt.MapClaims).VerifyIssuer(iss, true)
+		if !checkIss {
+			log.Fatalf("Invalid isssuer.")
+		}
+		log.Printf("Check isssuer: %v", checkIss)
+		checkAud := token.Claims.(jwt.MapClaims).VerifyAudience(Audience, true)
+		if !checkAud {
+			log.Fatalf("Invalid audience.")
+		}
+		log.Printf("Check audience: %v", checkAud)
+	}
 
-	// if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
-	// 	fmt.Printf("claims %v\n", claims)
-	// 	// fmt.Printf("user_id: %v\n", int64(claims["user_id"].(float64)))
-	// 	fmt.Printf("exp: %v\n", int64(claims["exp"].(float64)))
-	// } else {
-	// 	fmt.Println(err)
-	// }
+	return token.Valid
+
 }
 
 // BFF → workflow → api2 呼び出し
@@ -158,9 +156,9 @@ func workflowHandler(w http.ResponseWriter, r *http.Request) {
 
 // BFF → api2 呼び出し
 func api2Handler(w http.ResponseWriter, r *http.Request) {
-	// Auth0の認証情報をそのまま取り出す
+	// extract auth0 Bearer token
 	auth0Token := r.Header.Get("X-Forwarded-Authorization")
-	// token から 'Beaere '文字列を取り除く
+	// remove token から 'Beaere '文字列を取り除く
 	rep := regexp.MustCompile(`Bearer `)
 	auth0Token = rep.ReplaceAllString(auth0Token, "")
 	// トークンの検証
