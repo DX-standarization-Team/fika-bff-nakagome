@@ -29,16 +29,10 @@ func New() *http.ServeMux {
 	router.Handle("/workflow", http.HandlerFunc(workflowHandler))
 
 	// This route is only accessible if the user has a valid access_token.
-<<<<<<< HEAD
-	router.Handle("/api2", middleware.EnsureValidToken()(
-		http.HandlerFunc(api2Handler),
-	))
-=======
 	// router.Handle("/api2", middleware.VerifyToekn()(
 	// 	http.HandlerFunc(api2Handler),
 	// ))
 	router.Handle("/api2", middleware.JWTAuthMiddleware(http.HandlerFunc(api2Handler)))
->>>>>>> 03ef2c790aaff52849867f06dc32e57e7228966a
 
 	return router
 }
