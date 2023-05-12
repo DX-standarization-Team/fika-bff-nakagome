@@ -14,6 +14,7 @@ import (
 )
 
 const AUTH0_AUDIENCE = "https://fs-apigw-bff-nakagome-bi5axj14.uc.gateway.dev/"
+const AUTH0_DOMAIN = "dev-kjqwuq76z8suldgw.us.auth0.com"
 
 // // CustomClaims contains custom data we want from the token.
 // type CustomClaims struct {
@@ -41,8 +42,8 @@ const AUTH0_AUDIENCE = "https://fs-apigw-bff-nakagome-bi5axj14.uc.gateway.dev/"
 
 // EnsureValidToken is a middleware that will check the validity of our JWT.
 func EnsureValidToken() func(next http.Handler) http.Handler {
-	issuerURL, err := url.Parse("https://dev-kjqwuq76z8suldgw.us.auth0.com/")
 	// issuerURL, err := url.Parse("https://" + os.Getenv("AUTH0_DOMAIN") + "/")
+	issuerURL, err := url.Parse("https://" + AUTH0_DOMAIN + "/")
 	if err != nil {
 		log.Fatalf("Failed to parse the issuer url: %v", err)
 	}
@@ -77,6 +78,7 @@ func EnsureValidToken() func(next http.Handler) http.Handler {
 		w.Write([]byte(`{"message":"Failed to validate JWT."}`))
 	}
 
+	log.Printf("create jwtMiddleware instance")
 	middleware := jwtmiddleware.New(
 		jwtValidator.ValidateToken,
 		jwtmiddleware.WithErrorHandler(errorHandler),
@@ -84,6 +86,7 @@ func EnsureValidToken() func(next http.Handler) http.Handler {
 	)
 
 	return func(next http.Handler) http.Handler {
+		log.Printf("middleware.CheckJWT starts")
 		return middleware.CheckJWT(next)
 	}
 }
