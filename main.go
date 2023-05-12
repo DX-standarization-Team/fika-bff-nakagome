@@ -25,6 +25,7 @@ const Location = "us-central1"
 const workflowName = "fs-workflow-nakagome"
 
 const Audience = "https://fs-apigw-bff-nakagome-bi5axj14.uc.gateway.dev/"
+const Audience2 = "https://dev-kjqwuq76z8suldgw.us.auth0.com/userinfo"
 const DomainName = "dev-kjqwuq76z8suldgw.us.auth0.com"
 
 func main() {
@@ -101,11 +102,19 @@ func verifyToken(tokenString string) bool {
 		log.Printf("Failed to Parse the token: %v", err)
 	}
 
+	// 取得したトークンで検証
 	log.Printf("token.Valid: %v", token.Valid)
+	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
+		// confirm audience
+		log.Printf("aud: %v", claims["aud"])
+	} else {
+		fmt.Println(err)
+	}
+
 	if !token.Valid {
 		log.Printf("Invalid token.")
 	} else {
-		// confirm each claim
+		// confirm each audience
 		iss := "https://" + DomainName + "/"
 		checkIss := token.Claims.(jwt.MapClaims).VerifyIssuer(iss, true)
 		if !checkIss {
