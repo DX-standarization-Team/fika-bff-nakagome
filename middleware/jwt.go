@@ -1,92 +1,122 @@
 package middleware
 
 import (
+	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
-	"net/url"
+	"regexp"
 
-	"time"
-
-	jwtmiddleware "github.com/auth0/go-jwt-middleware/v2"
-	"github.com/auth0/go-jwt-middleware/v2/jwks"
-	"github.com/auth0/go-jwt-middleware/v2/validator"
+	"github.com/dgrijalva/jwt-go"
 )
 
-const AUTH0_AUDIENCE = "https://fs-apigw-bff-nakagome-bi5axj14.uc.gateway.dev/"
-const AUTH0_DOMAIN = "dev-kjqwuq76z8suldgw.us.auth0.com"
+const Audience = "https://fs-apigw-bff-nakagome-bi5axj14.uc.gateway.dev/"
+const Audience2 = "https://dev-kjqwuq76z8suldgw.us.auth0.com/userinfo"
+const DomainName = "dev-kjqwuq76z8suldgw.us.auth0.com"
 
-// // CustomClaims contains custom data we want from the token.
-// type CustomClaims struct {
-// 	Scope string `json:"scope"`
-// }
+type Jwks struct {
+	Keys []JSONWebKeys `json:"keys"`
+}
 
-// // Validate does nothing for this example, but we need
-// // it to satisfy validator.CustomClaims interface.
-// func (c CustomClaims) Validate(ctx context.Context) error {
-// 	return nil
-// }
-
-// scopeは今回使用しない
-// // HasScope checks whether our claims have a specific scope.
-// func (c CustomClaims) HasScope(expectedScope string) bool {
-// 	result := strings.Split(c.Scope, " ")
-// 	for i := range result {
-// 		if result[i] == expectedScope {
-// 			return true
-// 		}
-// 	}
-
-// 	return false
-// }
+type JSONWebKeys struct {
+	Kty string   `json:"kty"`
+	Kid string   `json:"kid"`
+	Use string   `json:"use"`
+	N   string   `json:"n"`
+	E   string   `json:"e"`
+	X5c []string `json:"x5c"`
+}
 
 // EnsureValidToken is a middleware that will check the validity of our JWT.
-func EnsureValidToken() func(next http.Handler) http.Handler {
-	// issuerURL, err := url.Parse("https://" + os.Getenv("AUTH0_DOMAIN") + "/")
-	issuerURL, err := url.Parse("https://" + AUTH0_DOMAIN + "/")
+func JWTAuthMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		// Auth0のトークンを取得
+		auth0Token := r.Header.Get("X-Forwarded-Authorization")
+		// トークンから'Beaere '文字列を取り除く
+		rep := regexp.MustCompile(`Bearer `)
+		auth0Token = rep.ReplaceAllString(auth0Token, "")
+		// トークンの検証
+		_, err := verifyToken(auth0Token)
+		if err != nil {
+			log.Fatalf("verifyToekn Failed. %v", err)
+			w.Write([]byte("JWT Verification failed."))
+			return
+		}
+		// Our middleware logic goes here...
+		next.ServeHTTP(w, r)
+	})
+}
+
+func verifyToken(tokenString string) (bool, error) {
+
+	// Parse and validate, and returns a token
+	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
+		// Don't forget to validate the alg is what you expect:
+		if _, ok := token.Method.(*jwt.SigningMethodRSA); !ok {
+			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
+		}
+		// https://github.com/dgrijalva/jwt-go/issues/438 参考
+		// get certificate from JSON Web Key Set from Auth0
+		cert := ""
+		resp, err := http.Get("https://" + DomainName + "/.well-known/jwks.json")
+		if err != nil {
+			log.Printf("failed to get certificate: resp.Status: %v, err: %v", resp.Status, err)
+		}
+		log.Println("succeeded to get certificate")
+		defer resp.Body.Close()
+		// convert response into Jwks structure
+		var jwks = Jwks{}
+		err = json.NewDecoder(resp.Body).Decode(&jwks)
+		if err != nil {
+			log.Printf("failed to decode the certificate: %v", err)
+		}
+		log.Printf("jwks: %v", jwks)
+		// find an appropriate certificate
+		for k, _ := range jwks.Keys {
+			if token.Header["kid"] == jwks.Keys[k].Kid {
+				cert = "-----BEGIN CERTIFICATE-----\n" + jwks.Keys[k].X5c[0] + "\n-----END CERTIFICATE-----"
+			}
+		}
+		log.Printf("cert: %v", cert)
+		if cert == "" {
+			log.Printf("Unable to find appropriate key.")
+		}
+		// get a RSA public key from the certificate
+		result, _ := jwt.ParseRSAPublicKeyFromPEM([]byte(cert))
+		log.Printf("result: %v", result)
+		// returns *rsa.publicKey in case of rsa
+		return result, nil
+	})
 	if err != nil {
-		log.Fatalf("Failed to parse the issuer url: %v", err)
-	}
-	log.Printf("Parsed issuerURL: %s", issuerURL)
-
-	provider := jwks.NewCachingProvider(issuerURL, 5*time.Minute)
-	log.Printf("provider: %v", provider)
-	jwtValidator, err := validator.New(
-		provider.KeyFunc,
-		validator.RS256,
-		issuerURL.String(),
-		[]string{AUTH0_AUDIENCE},
-		// []string{os.Getenv("AUTH0_AUDIENCE")},
-		// 今回はカスタムクレーム特にみない
-		// validator.WithCustomClaims(
-		// 	func() validator.CustomClaims {
-		// 		return &CustomClaims{}
-		// 	},
-		// ),
-		validator.WithAllowedClockSkew(time.Minute),
-	)
-	if err != nil {
-		log.Fatalf("Failed to set up the jwt validator")
-	}
-	log.Printf("jwtValidator: %v", jwtValidator)
-
-	errorHandler := func(w http.ResponseWriter, r *http.Request, err error) {
-		log.Printf("Encountered error while validating JWT: %v", err)
-
-		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(http.StatusUnauthorized)
-		w.Write([]byte(`{"message":"Failed to validate JWT."}`))
+		return false, fmt.Errorf("ailed to Parse the token: %w", err)
 	}
 
-	log.Printf("create jwtMiddleware instance")
-	middleware := jwtmiddleware.New(
-		jwtValidator.ValidateToken,
-		jwtmiddleware.WithErrorHandler(errorHandler),
-		// 以下メソッドはクエリの文字列から抽出する際の指定方法であったためNG
-		// jwtmiddleware.WithTokenExtractor(jwtmiddleware.ParameterTokenExtractor("X-Forwarded-Authorization")),
-	)
-
-	return func(next http.Handler) http.Handler {
-		log.Printf("middleware.CheckJWT starts")
-		return middleware.CheckJWT(next)
+	// 取得したトークンで検証
+	log.Printf("token.Valid: %v", token.Valid)
+	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
+		// confirm audience
+		log.Printf("aud: %v", claims["aud"])
+	} else {
+		fmt.Println(err)
 	}
+
+	if !token.Valid {
+		return false, fmt.Errorf("Invalid token.")
+	} else {
+		// confirm each audience
+		iss := "https://" + DomainName + "/"
+		checkIss := token.Claims.(jwt.MapClaims).VerifyIssuer(iss, true)
+		if !checkIss {
+			return false, fmt.Errorf("Invalid isssuer.")
+		}
+		log.Printf("Check isssuer: %v", checkIss)
+		checkAud := token.Claims.(jwt.MapClaims).VerifyAudience(Audience, true)
+		if !checkAud {
+			return false, fmt.Errorf("Invalid audience.")
+		}
+		log.Printf("Check audience: %v", checkAud)
+	}
+
+	return token.Valid, nil
+
 }
