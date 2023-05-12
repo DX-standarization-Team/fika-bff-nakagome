@@ -29,7 +29,7 @@ const x5c = "MIIDHTCCAgWgAwIBAgIJUza6LlfdwHcMMA0GCSqGSIb3DQEBCwUAMCwxKjAoBgNVBAM
 
 func main() {
 
-	router := http.NewServeMux()
+	// router := http.NewServeMux()
 
 	http.HandleFunc("/workflow", workflowHandler)
 	http.HandleFunc("/api2", api2Handler)
@@ -40,7 +40,8 @@ func main() {
 		port = "8080"
 	}
 	log.Print("Server listening on http://localhost:8080")
-	if err := http.ListenAndServe(":"+port, router); err != nil {
+
+	if err := http.ListenAndServe(":"+port, nil); err != nil {
 		log.Fatalf("There was an error with the http server: %v", err)
 	}
 }
@@ -105,7 +106,7 @@ func verifyToken(tokenString string) bool {
 		cert := "-----BEGIN CERTIFICATE-----\n" + x5c + "\n-----END CERTIFICATE-----"
 
 		result, _ := jwt.ParseRSAPublicKeyFromPEM([]byte(cert))
-		return result, nil
+		return result, nil // returns *rsa.publicKey
 		// return []byte("SECRET_KEY"), nil
 	})
 	if err != nil {
