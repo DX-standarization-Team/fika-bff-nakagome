@@ -13,7 +13,7 @@ import (
 
 // golang では slice, array, mapは定数として使用できない(https://tech.notti.link/02b52f2)
 const Audience = "https://fs-apigw-bff-nakagome-bi5axj14.uc.gateway.dev/"
-const Audience2 = "https://dev-kjqwuq76z8suldgw.us.auth0.com/userinfo"
+const Audience2 = "https://dev-kjqwuq76z8suldgw.us.auth0.com/userinfo,https://fs-apigw-bff-nakagome-bi5axj14.uc.gateway.dev/"
 const DomainName = "dev-kjqwuq76z8suldgw.us.auth0.com"
 
 type Jwks struct {
@@ -35,6 +35,8 @@ type KeycloakClaims struct {
 	Audience multiString `json:"aud,omitempty"`
 }
 
+// Unmarshal のカスタマイズ
+// Unmarshal が呼び出されたときに自動的に UnmarshalJSON が呼び出される
 func (ms *multiString) UnmarshalJSON(data []byte) error {
 	if len(data) > 0 {
 		switch data[0] {
@@ -94,6 +96,7 @@ func verifyToken(tokenString string) (bool, error) {
 		defer resp.Body.Close()
 		// convert response into Jwks structure
 		var jwks = Jwks{}
+
 		err = json.NewDecoder(resp.Body).Decode(&jwks)
 		if err != nil {
 			log.Printf("failed to decode the certificate: %v", err)
@@ -122,15 +125,6 @@ func verifyToken(tokenString string) (bool, error) {
 	// 取得したトークンで検証
 	log.Printf("token.Valid: %v", token.Valid)
 	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
-		// confirm audience
-		log.Printf("aud: %v", claims["aud"])
-	} else {
-		fmt.Println(err)
-	}
-
-	if !token.Valid {
-		return false, fmt.Errorf("Invalid token.")
-	} else {
 		// check each claim
 		iss := "https://" + DomainName + "/"
 		checkIss := token.Claims.(jwt.MapClaims).VerifyIssuer(iss, true)
@@ -138,13 +132,17 @@ func verifyToken(tokenString string) (bool, error) {
 			return false, fmt.Errorf("Invalid isssuer.")
 		}
 		log.Printf("Check isssuer: %v", checkIss)
-		// checkAud := token.Claims.(jwt.MapClaims).VerifyAudience(Audience, true)
-		// if !checkAud {
-		// 	return false, fmt.Errorf("Invalid audience.")
-		// }
-		// log.Printf("Check audience: %v", checkAud)
-	}
 
-	return token.Valid, nil
+		// confirm audience
+		log.Printf("aud: %v", claims["aud"])
+		checkAud := token.Claims.(jwt.MapClaims).VerifyAudience(Audience, true) || token.Claims.(jwt.MapClaims).VerifyAudience(Audience2, true)
+		if !checkAud {
+			return false, fmt.Errorf("Invalid audience.")
+		}
+		log.Printf("Check audience: %v", checkAud)
+		return checkIss && checkAud, nil
+	} else {
+		return false, fmt.Errorf("Invalid token.")
+	}
 
 }
