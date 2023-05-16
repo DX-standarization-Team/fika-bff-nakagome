@@ -29,7 +29,7 @@ type JSONWebKeys struct {
 	X5c []string `json:"x5c"`
 }
 
-// https://github.com/dgrijalva/jwt-go/pull/308 参考
+// audienceが文字列でなく配列であった際の対応：https://github.com/dgrijalva/jwt-go/pull/308 参考
 type multiString string
 type KeycloakClaims struct {
 	Audience multiString `json:"aud,omitempty"`
