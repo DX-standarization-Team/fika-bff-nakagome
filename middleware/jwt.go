@@ -11,7 +11,10 @@ import (
 )
 
 const Audience = "https://fs-apigw-bff-nakagome-bi5axj14.uc.gateway.dev/"
-const Audience2 = "https://dev-kjqwuq76z8suldgw.us.auth0.com/userinfo"
+const Audience2 = [2] string {
+	"https://fs-apigw-bff-nakagome-bi5axj14.uc.gateway.dev/",
+	"https://dev-kjqwuq76z8suldgw.us.auth0.com/userinfo",
+}
 const DomainName = "dev-kjqwuq76z8suldgw.us.auth0.com"
 
 type Jwks struct {
@@ -110,6 +113,7 @@ func verifyToken(tokenString string) (bool, error) {
 			return false, fmt.Errorf("Invalid isssuer.")
 		}
 		log.Printf("Check isssuer: %v", checkIss)
+		audienceArr := [Audience, Audience2]
 		checkAud := token.Claims.(jwt.MapClaims).VerifyAudience(Audience, true) || token.Claims.(jwt.MapClaims).VerifyAudience(Audience2, true)
 		if !checkAud {
 			return false, fmt.Errorf("Invalid audience.")
