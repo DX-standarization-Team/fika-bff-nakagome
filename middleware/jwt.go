@@ -105,6 +105,7 @@ func verifyToken(tokenString string) (bool, error) {
 			return false, fmt.Errorf("Invalid isssuer.")
 		}
 		log.Printf("Check isssuer: %v", checkIss)
+
 		// checkAud := token.Claims.(jwt.MapClaims).VerifyAudience(Audience, true) || token.Claims.(jwt.MapClaims).VerifyAudience(Audience2, true)
 		// if !checkAud {
 		// 	return false, fmt.Errorf("Invalid audience.")
