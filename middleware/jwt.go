@@ -1,19 +1,23 @@
 package middleware
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
 	"regexp"
 	"strings"
+	"time"
 
-	"github.com/form3tech-oss/jwt-go"
+	"github.com/lestrrat-go/jwx/v2/jwk"
+	"github.com/lestrrat-go/jwx/v2/jwt"
 )
 
 // golang では slice, array, mapは定数として使用できない(https://tech.notti.link/02b52f2)
 const Audience = "https://fs-apigw-bff-nakagome-bi5axj14.uc.gateway.dev/"
-const Audience2 = "https://dev-kjqwuq76z8suldgw.us.auth0.com/userinfo"
+
+// const Audience2 = "https://dev-kjqwuq76z8suldgw.us.auth0.com/userinfo"
 const DomainName = "dev-kjqwuq76z8suldgw.us.auth0.com"
 
 type Jwks struct {
@@ -76,75 +80,41 @@ func JWTAuthMiddleware(next http.Handler) http.Handler {
 }
 
 func verifyToken(tokenString string) (bool, error) {
-
-	// Parse and validate, and returns a token
-	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
-		// Don't forget to validate the alg is what you expect:
-		if _, ok := token.Method.(*jwt.SigningMethodRSA); !ok {
-			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
-		}
-		// https://github.com/dgrijalva/jwt-go/issues/438 参考
-		// get certificate from JSON Web Key Set from Auth0
-		cert := ""
-		resp, err := http.Get("https://" + DomainName + "/.well-known/jwks.json")
-		if err != nil {
-			log.Printf("failed to get certificate: resp.Status: %v, err: %v", resp.Status, err)
-		}
-		log.Println("succeeded to get certificate")
-		defer resp.Body.Close()
-		// convert response into Jwks structure
-		var jwks = Jwks{}
-		err = json.NewDecoder(resp.Body).Decode(&jwks)
-		if err != nil {
-			log.Printf("failed to decode the certificate: %v", err)
-		}
-		log.Printf("jwks: %v", jwks)
-		// find an appropriate certificate
-		for k, _ := range jwks.Keys {
-			if token.Header["kid"] == jwks.Keys[k].Kid {
-				cert = "-----BEGIN CERTIFICATE-----\n" + jwks.Keys[k].X5c[0] + "\n-----END CERTIFICATE-----"
-			}
-		}
-		log.Printf("cert: %v", cert)
-		if cert == "" {
-			log.Printf("Unable to find appropriate key.")
-		}
-		// get a RSA public key from the certificate
-		result, _ := jwt.ParseRSAPublicKeyFromPEM([]byte(cert))
-		log.Printf("result: %v", result)
-		// returns *rsa.publicKey in case of rsa
-		return result, nil
-	})
+	// fetch tenant keys
+	tenantKeys, err := jwk.Fetch(context.Background(), fmt.Sprintf("https://%s/.well-known/jwks.json", DomainName))
 	if err != nil {
-		return false, fmt.Errorf("ailed to Parse the token: %w", err)
+		log.Printf("failed to parse tenant json web keys: err: %v", err)
 	}
-
-	// 取得したトークンで検証
-	log.Printf("token.Valid: %v", token.Valid)
-	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
-		// confirm audience
-		log.Printf("aud: %v", claims["aud"])
-	} else {
-		fmt.Println(err)
+	log.Printf("tenantKeys: %v", tenantKeys)
+	token, err := jwt.Parse(
+		[]byte(tokenString),
+		jwt.WithKeySet(tenantKeys),
+		jwt.WithAudience(Audience),
+		jwt.WithAcceptableSkew(time.Minute),
+	)
+	if token != nil && err != nil {
+		log.Printf("failed to parse the token. err: %v", err)
+		return false, err
 	}
+	return true, nil
 
-	if !token.Valid {
-		return false, fmt.Errorf("Invalid token.")
-	} else {
-		// check each claim
-		iss := "https://" + DomainName + "/"
-		checkIss := token.Claims.(jwt.MapClaims).VerifyIssuer(iss, true)
-		if !checkIss {
-			return false, fmt.Errorf("Invalid isssuer.")
-		}
-		log.Printf("Check isssuer: %v", checkIss)
-		// checkAud := token.Claims.(jwt.MapClaims).VerifyAudience(Audience, true)
-		// if !checkAud {
-		// 	return false, fmt.Errorf("Invalid audience.")
-		// }
-		// log.Printf("Check audience: %v", checkAud)
-	}
+	// if !token.Valid {
+	// 	return false, fmt.Errorf("Invalid token.")
+	// } else {
+	// 	// check each claim
+	// 	iss := "https://" + DomainName + "/"
+	// 	checkIss := token.Claims.(jwt.MapClaims).VerifyIssuer(iss, true)
+	// 	if !checkIss {
+	// 		return false, fmt.Errorf("Invalid isssuer.")
+	// 	}
+	// 	log.Printf("Check isssuer: %v", checkIss)
+	// 	// checkAud := token.Claims.(jwt.MapClaims).VerifyAudience(Audience, true)
+	// 	// if !checkAud {
+	// 	// 	return false, fmt.Errorf("Invalid audience.")
+	// 	// }
+	// 	// log.Printf("Check audience: %v", checkAud)
+	// }
 
-	return token.Valid, nil
+	// return token.Valid, nil
 
 }
