@@ -70,12 +70,13 @@ func verifyToken(tokenString string) (bool, error) {
 		return false, err
 	}
 
+	// WithAcceptableSkewの検証
 	log.Printf("WithAcceptableSkewの検証")
 	exp := token.Expiration() //tokenに含まれている有効期限
 	log.Printf("tokenに含まれている有効期限。exp: %v", exp)
 	diff := exp.Sub(time.Now())
 	log.Printf("現時刻との差分。 diff: %v", diff)
-	token.Expiration().Add(-(diff + 10000000000))
+	token.Set("exp", token.Expiration().Add(-(diff + 10000000000)))
 	log.Printf("有効期限を現時刻の10秒前にセット。 exp: %v", token.Expiration())
 	token2, err := jwt.Parse(
 		[]byte(tokenString),
