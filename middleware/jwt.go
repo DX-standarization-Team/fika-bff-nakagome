@@ -18,18 +18,18 @@ const Audience = "https://fs-apigw-bff-nakagome-bi5axj14.uc.gateway.dev/"
 // const Audience2 = "https://dev-kjqwuq76z8suldgw.us.auth0.com/userinfo"
 const DomainName = "dev-kjqwuq76z8suldgw.us.auth0.com"
 
-type Jwks struct {
-	Keys []JSONWebKeys `json:"keys"`
-}
+// type Jwks struct {
+// 	Keys []JSONWebKeys `json:"keys"`
+// }
 
-type JSONWebKeys struct {
-	Kty string   `json:"kty"`
-	Kid string   `json:"kid"`
-	Use string   `json:"use"`
-	N   string   `json:"n"`
-	E   string   `json:"e"`
-	X5c []string `json:"x5c"`
-}
+// type JSONWebKeys struct {
+// 	Kty string   `json:"kty"`
+// 	Kid string   `json:"kid"`
+// 	Use string   `json:"use"`
+// 	N   string   `json:"n"`
+// 	E   string   `json:"e"`
+// 	X5c []string `json:"x5c"`
+// }
 
 // EnsureValidToken is a middleware that will check the validity of our JWT.
 func JWTAuthMiddleware(next http.Handler) http.Handler {
@@ -52,12 +52,13 @@ func JWTAuthMiddleware(next http.Handler) http.Handler {
 }
 
 func verifyToken(tokenString string) (bool, error) {
+
 	// fetch tenant keys
 	tenantKeys, err := jwk.Fetch(context.Background(), fmt.Sprintf("https://%s/.well-known/jwks.json", DomainName))
 	if err != nil {
 		log.Printf("failed to parse tenant json web keys: err: %v", err)
 	}
-	log.Printf("tenantKeys: %v", tenantKeys)
+	log.Printf("tenantKeys: %v", tenantKeys.Len())
 	token, err := jwt.Parse(
 		[]byte(tokenString),
 		jwt.WithKeySet(tenantKeys),
@@ -68,25 +69,24 @@ func verifyToken(tokenString string) (bool, error) {
 		log.Printf("failed to parse the token. err: %v", err)
 		return false, err
 	}
+
+	log.Printf("WithAcceptableSkewの検証")
+	exp := token.Expiration() //tokenに含まれている有効期限
+	log.Printf("tokenに含まれている有効期限。exp: %v", exp)
+	diff := exp.Sub(time.Now())
+	log.Printf("現時刻との差分。 diff: %v", diff)
+	token.Expiration().Add(-(diff + 10000000000))
+	log.Printf("有効期限を現時刻の10秒前にセット。 exp: %v", token.Expiration())
+	token2, err := jwt.Parse(
+		[]byte(tokenString),
+		jwt.WithKeySet(tenantKeys),
+		jwt.WithAcceptableSkew(time.Minute),
+	)
+	if token2 != nil && err != nil {
+		log.Printf("token is expired. err: %v", err)
+		return false, err
+	}
+
 	return true, nil
-
-	// if !token.Valid {
-	// 	return false, fmt.Errorf("Invalid token.")
-	// } else {
-	// 	// check each claim
-	// 	iss := "https://" + DomainName + "/"
-	// 	checkIss := token.Claims.(jwt.MapClaims).VerifyIssuer(iss, true)
-	// 	if !checkIss {
-	// 		return false, fmt.Errorf("Invalid isssuer.")
-	// 	}
-	// 	log.Printf("Check isssuer: %v", checkIss)
-	// 	// checkAud := token.Claims.(jwt.MapClaims).VerifyAudience(Audience, true)
-	// 	// if !checkAud {
-	// 	// 	return false, fmt.Errorf("Invalid audience.")
-	// 	// }
-	// 	// log.Printf("Check audience: %v", checkAud)
-	// }
-
-	// return token.Valid, nil
 
 }
