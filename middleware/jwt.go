@@ -61,6 +61,7 @@ func verifyToken(tokenString string) (bool, error) {
 	token, err := jwt.Parse(
 		[]byte(tokenString),
 		jwt.WithKeySet(tenantKeys),
+		jwt.WithValidate(true),
 		jwt.WithAudience(Audience),
 		jwt.WithAcceptableSkew(time.Minute),
 	)
@@ -80,18 +81,11 @@ func verifyToken(tokenString string) (bool, error) {
 	// log.Printf("有効期限を現時刻の10秒前にセット。 exp: %v", token.Expiration())
 	token.Set("exp", token.Expiration().Add(-(diff + time.Duration(2)*time.Minute)))
 	log.Printf("有効期限を現時刻の2分前にセット。 exp: %v", token.Expiration())
-	token2, err := jwt.Parse(
-		[]byte(tokenString),
-		jwt.WithKeySet(tenantKeys),
-		jwt.WithValidate(true),
-		jwt.WithAudience(Audience),
-		jwt.WithAcceptableSkew(time.Minute),
-	)
-	if token2 != nil && err != nil {
-		log.Printf("failed to parse the token. err: %v", err)
-		return false, err
+	valid := jwt.Validate(token, jwt.WithAcceptableSkew(time.Minute))
+	if valid != nil {
+		log.Printf("token is expired. err: %v", valid)
+		return false, valid
 	}
-
 	return true, nil
 
 }
