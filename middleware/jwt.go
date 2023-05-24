@@ -79,8 +79,8 @@ func verifyToken(tokenString string) (bool, error) {
 	log.Printf("現時刻との差分。 diff: %v", diff)
 	// token.Set("exp", token.Expiration().Add(-(diff + 10000000000)))
 	// log.Printf("有効期限を現時刻の10秒前にセット。 exp: %v", token.Expiration())
-	token.Set("exp", token.Expiration().Add(-(diff + 70000000000)))
-	log.Printf("有効期限を現時刻の1分10秒前にセット。 exp: %v", token.Expiration())
+	token.Set("exp", token.Expiration().Add(-(diff + 120000000000)))
+	log.Printf("有効期限を現時刻の2分前にセット。 exp: %v", token.Expiration())
 	token2, err := jwt.Parse(
 		[]byte(tokenString),
 		jwt.WithKeySet(tenantKeys),
