@@ -40,10 +40,9 @@ func JWTAuthMiddleware(next http.Handler) http.Handler {
 		rep := regexp.MustCompile(`Bearer `)
 		auth0Token = rep.ReplaceAllString(auth0Token, "")
 		// トークンの検証
-		_, err := verifyToken(auth0Token)
+		err := verifyToken(auth0Token)
 		if err != nil {
-			log.Fatalf("verifyToekn Failed. %v", err)
-			w.Write([]byte("JWT Verification failed."))
+			w.Write([]byte(err.Error()))
 			return
 		}
 		// Our middleware logic goes here...
@@ -51,11 +50,12 @@ func JWTAuthMiddleware(next http.Handler) http.Handler {
 	})
 }
 
-func verifyToken(tokenString string) (bool, error) {
+func verifyToken(tokenString string) error {
 	// fetch tenant keys
 	tenantKeys, err := jwk.Fetch(context.Background(), fmt.Sprintf("https://%s/.well-known/jwks.json", DomainName))
 	if err != nil {
 		log.Printf("failed to parse tenant json web keys: err: %v", err)
+		return fmt.Errorf("failed to parse tenant json web keys: err: %v", err)
 	}
 	log.Printf("tenantKeys: %v", tenantKeys.Len())
 	token, err := jwt.Parse(
@@ -65,9 +65,9 @@ func verifyToken(tokenString string) (bool, error) {
 		jwt.WithAudience(Audience),
 		jwt.WithAcceptableSkew(time.Minute),
 	)
-	if token != nil && err != nil {
+	if err != nil {
 		log.Printf("failed to parse the token. err: %v", err)
-		return false, err
+		return fmt.Errorf("failed to parse the token. err: %v", err)
 	}
 
 	// WithAcceptableSkewの検証
@@ -84,8 +84,7 @@ func verifyToken(tokenString string) (bool, error) {
 	valid := jwt.Validate(token, jwt.WithAcceptableSkew(time.Minute))
 	if valid != nil {
 		log.Printf("token is expired. err: %v", valid)
-		return false, valid
+		return fmt.Errorf("token is expired. err: %v", valid)
 	}
-	return true, nil
-
+	return nil
 }
