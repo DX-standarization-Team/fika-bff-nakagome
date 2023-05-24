@@ -62,7 +62,7 @@ func verifyToken(tokenString string) (bool, error) {
 		[]byte(tokenString),
 		jwt.WithKeySet(tenantKeys),
 		jwt.WithAudience(Audience),
-		jwt.WithAcceptableSkew(5*time.Minute),
+		jwt.WithAcceptableSkew(time.Minute),
 	)
 	if token != nil && err != nil {
 		log.Printf("failed to parse the token. err: %v", err)
@@ -83,6 +83,8 @@ func verifyToken(tokenString string) (bool, error) {
 	token2, err := jwt.Parse(
 		[]byte(tokenString),
 		jwt.WithKeySet(tenantKeys),
+		jwt.WithValidate(true),
+		jwt.WithAudience(Audience),
 		jwt.WithAcceptableSkew(time.Minute),
 	)
 	if token2 != nil && err != nil {
