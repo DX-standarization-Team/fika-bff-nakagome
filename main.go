@@ -1,22 +1,23 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"net/http"
-	"os"
+
+	"github.com/GoogleCloudPlatform/golang-samples/run/helloworld/router"
+	"github.com/joho/godotenv"
 )
 
 func main() {
-	log.Print("starting server...")
-	http.HandleFunc("/", handler)
-
-}
-
-func handler(w http.ResponseWriter, r *http.Request) {
-	name := os.Getenv("NAME")
-	if name == "" {
-		name = "World"
+	if err := godotenv.Load(); err != nil {
+		// log.Fatalf("Error loading the .env file: %v", err)
+		log.Printf("Error loading the .env file: %v", err)
 	}
-	fmt.Fprintf(w, "Hello %s!\n", name)
+
+	rtr := router.New()
+
+	log.Print("Server listening on http://localhost:8080")
+	if err := http.ListenAndServe("0.0.0.0:8080", rtr); err != nil {
+		log.Fatalf("There was an error with the http server: %v", err)
+	}
 }

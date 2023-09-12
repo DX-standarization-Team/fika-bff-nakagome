@@ -1,14 +1,16 @@
 name: Deploy
- 
+
 on: 
-  push:
+  pull_request:
     branches:
-      - feature/TRG-1
+      - develop
+    types: [closed]
+
 env:
   GCP_CREDENTIALS: ${{ secrets.GCP_CREDENTIALS }}
   GCP_PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
   IMAGE: gcr.io/${{ secrets.GCP_PROJECT_ID }}/test-image:${{ github.sha }}
-  SERVICE_NAME: go-githubactions-cloudrunbff
+  SERVICE_NAME: fika-bff-nakagome
   PORT: 80
   GCP_REGION: us-central1
    
