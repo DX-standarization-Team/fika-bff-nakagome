@@ -37,7 +37,7 @@ func New() *http.ServeMux {
 	return router
 }
 
-// BFF → workflow → api2 呼び出し
+// BFF → workflow → api1 呼び出し
 func workflowHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Auth0の認証情報を取り出す
@@ -60,6 +60,7 @@ func workflowHandler(w http.ResponseWriter, r *http.Request) {
 		},
 	}
 	resp, err := client.CreateExecution(ctx, req)
+	log.Printf("workflows response: %v", resp)
 	if err != nil {
 		http.Error(w, fmt.Sprintf("client.CreateExecution failed...: %v", err), http.StatusInternalServerError)
 	}

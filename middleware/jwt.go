@@ -54,7 +54,7 @@ func verifyToken(tokenString string) error {
 	// fetch tenant keys
 	tenantKeys, err := jwk.Fetch(context.Background(), fmt.Sprintf("https://%s/.well-known/jwks.json", DomainName))
 	if err != nil {
-		log.Printf("failed to parse tenant json web keys: err: %v", err)
+		// log.Printf("failed to parse tenant json web keys: err: %v", err)
 		return fmt.Errorf("failed to parse tenant json web keys: err: %v", err)
 	}
 	log.Printf("tenantKeys: %v", tenantKeys.Len())
@@ -66,7 +66,7 @@ func verifyToken(tokenString string) error {
 		jwt.WithAcceptableSkew(time.Minute),
 	)
 	if err != nil {
-		log.Printf("failed to parse the token. err: %v", err)
+		// log.Printf("failed to parse the token. err: %v", err)
 		return fmt.Errorf("failed to parse the token. err: %v", err)
 	}
 
@@ -83,7 +83,7 @@ func verifyToken(tokenString string) error {
 	// log.Printf("有効期限を現時刻の2分前にセット。 exp: %v", token.Expiration())
 	valid := jwt.Validate(token, jwt.WithAcceptableSkew(time.Minute))
 	if valid != nil {
-		log.Printf("token is expired. err: %v", valid)
+		// log.Printf("token is expired. err: %v", valid)
 		return fmt.Errorf("token is expired. err: %v", valid)
 	}
 	return nil
