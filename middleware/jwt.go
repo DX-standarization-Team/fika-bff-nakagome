@@ -52,12 +52,15 @@ func JWTAuthMiddleware(next http.Handler) http.Handler {
 func verifyToken(tokenString string) (jwt.Token, error) {
 	// 環境変数読み込み
 	auth0Domain := ""
+	auth0Audience := ""
 	if err := godotenv.Load(); err != nil {
 		// log.Fatalf("Error loading the .env file: %v", err)
 		log.Printf("Error loading the .env file: %v", err)
 		auth0Domain = "dev-kjqwuq76z8suldgw.us.auth0.com"
+		auth0Audience = "https://fs-apigw-bff-nakagome-bi5axj14.uc.gateway.dev/"
 	}else{
 		auth0Domain = os.Getenv("AUTH0_DOMAIN")
+		auth0Audience = os.Getenv("AUTH0_AUDIENCE")
 	}
 		
 	// tenant keysを取得
@@ -71,7 +74,7 @@ func verifyToken(tokenString string) (jwt.Token, error) {
 		[]byte(tokenString),
 		jwt.WithKeySet(tenantKeys),
 		jwt.WithValidate(true),
-		jwt.WithAudience(auth0Domain),
+		jwt.WithAudience(auth0Audience),
 		jwt.WithAcceptableSkew(time.Minute),
 	)
 	if err != nil {
