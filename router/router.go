@@ -12,6 +12,8 @@ import (
 	"google.golang.org/api/idtoken"
 
 	"github.com/GoogleCloudPlatform/golang-samples/run/helloworld/middleware"
+
+	"github.com/lestrrat-go/jwx/v2/jwt"
 )
 
 const Api1Url = "https://fika-api1-nakagome-wsgwmfbvhq-uc.a.run.app"
@@ -66,11 +68,17 @@ func workflowHandler(w http.ResponseWriter, r *http.Request) {
 func api2Handler(w http.ResponseWriter, r *http.Request) {
 	// token := r.Context().Value("token").(jwt.Token)	// .(jwt.Token) 型が含まれていることを確認（型アサーション）
 	
-	
 	// Header での引き渡し
 	auth0Token := r.Header.Get("X-Forwarded-Authorization")
 	// context での引き渡し
 	ctx := context.Background()
+	token := ctx.Value("token").(jwt.Token)
+	org_idClaim, ok := token.Get("org_id")
+	if !ok {
+		log.Fatal("org_id claim not found in JWT")
+	}
+	log.Printf("org_id: %s\n", org_idClaim.(string))
+	
 	client, err := idtoken.NewClient(ctx, Api2Url)
 	req, err := http.NewRequestWithContext(ctx, "GET", Api2Url, nil)
 	req.Header.Add("auth0-token", auth0Token)
