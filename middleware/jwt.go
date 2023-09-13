@@ -29,7 +29,7 @@ import (
 // }
 
 // EnsureValidToken is a middleware that will check the validity of our JWT.
-func JWTAuthMiddleware(next http.Handler) http.Handler {
+func JWTAuthenticationMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		auth0Token := r.Header.Get("X-Forwarded-Authorization")
 		// トークンから'Bearer '文字列を取り除く

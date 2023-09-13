@@ -28,7 +28,7 @@ func New() *http.ServeMux {
 	// This route is always accessible.
 	router.Handle("/workflow", http.HandlerFunc(workflowHandler))
 	// This route is only accessible if the user has a valid access_token.
-	router.Handle("/api2", middleware.JWTAuthMiddleware(http.HandlerFunc(api2Handler)))
+	router.Handle("/api2", middleware.JWTAuthenticationMiddleware(http.HandlerFunc(api2Handler)))
 	return router
 }
 
@@ -65,9 +65,8 @@ func workflowHandler(w http.ResponseWriter, r *http.Request) {
 
 // BFF → api2 呼び出し
 func api2Handler(w http.ResponseWriter, r *http.Request) {
-	
 	// Retrieve the token from the request context
-	tokenString := r.Context().Value("token").(string)
+	tokenString := r.Context().Value("auth0Token").(string)
 	fmt.Fprintf(w, "Token retrived from Context: %s\n", tokenString)
 	token, err := jwt.Parse([]byte(tokenString))
 	org_idClaim, ok := token.Get("org_id")
