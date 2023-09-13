@@ -15,38 +15,37 @@ import (
 	"github.com/lestrrat-go/jwx/v2/jwt"
 )
 
-// type Jwks struct {
-// 	Keys []JSONWebKeys `json:"keys"`
-// }
-
-// type JSONWebKeys struct {
-// 	Kty string   `json:"kty"`
-// 	Kid string   `json:"kid"`
-// 	Use string   `json:"use"`
-// 	N   string   `json:"n"`
-// 	E   string   `json:"e"`
-// 	X5c []string `json:"x5c"`
-// }
-
 // EnsureValidToken is a middleware that will check the validity of our JWT.
-func JWTAuthenticationMiddleware(next http.Handler) http.Handler {
+func JwtAuthenticationMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		auth0Token := r.Header.Get("X-Forwarded-Authorization")
-		// トークンから'Bearer '文字列を取り除く
+		// 'Bearer '文字列を取り除きトークン検証
 		rep := regexp.MustCompile(`Bearer `)
 		auth0Token = rep.ReplaceAllString(auth0Token, "")
-		// トークンの検証
 		token, err := verifyToken(auth0Token)
 		if err != nil {
 			w.Write([]byte(err.Error()))
 			return
 		}
 		// Store the token in the request context
-		ctx := context.WithValue(r.Context(), "auth0Token", token)
+		ctx := context.WithValue(r.Context(), "token", token)
 		// Our middleware logic goes here...
 		// next.ServeHTTP(w, r)
 		next.ServeHTTP(w, r.WithContext(ctx))
 	})
+}
+
+
+// tokenから特定のクレーム値を取得する
+func retrieveClaim(token jwt.Token, claim string) interface{} {
+	// Retrieve the token from the request context
+	log.Printf("Retrieve the token from the request context")
+	value, ok := token.Get(claim)
+	if !ok {
+		log.Fatal("org_id claim not found in JWT")
+	}
+	// value := value.(string)
+	return value
 }
 
 func verifyToken(tokenString string) (jwt.Token, error) {
