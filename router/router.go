@@ -9,7 +9,7 @@ import (
 
 	executions "cloud.google.com/go/workflows/executions/apiv1"
 	executionspb "cloud.google.com/go/workflows/executions/apiv1/executionspb"
-	_ "google.golang.org/api/idtoken"
+	"google.golang.org/api/idtoken"
 
 	"github.com/GoogleCloudPlatform/golang-samples/run/helloworld/middleware"
 )
@@ -65,11 +65,13 @@ func workflowHandler(w http.ResponseWriter, r *http.Request) {
 // BFF → api2 呼び出し
 func api2Handler(w http.ResponseWriter, r *http.Request) {
 	// token := r.Context().Value("token").(jwt.Token)	// .(jwt.Token) 型が含まれていることを確認（型アサーション）
-	ctx := context.Background()
 	
-	// api2へのAuthorization Headerの引き渡し
+	
+	// Header での引き渡し
 	auth0Token := r.Header.Get("X-Forwarded-Authorization")
-	client := &http.Client{}
+	// context での引き渡し
+	ctx := context.Background()
+	client, err := idtoken.NewClient(ctx, Api2Url)
 	req, err := http.NewRequestWithContext(ctx, "GET", Api2Url, nil)
 	req.Header.Add("auth0-token", auth0Token)
 	resp, err := client.Do(req)
