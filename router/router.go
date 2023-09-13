@@ -12,6 +12,7 @@ import (
 	"google.golang.org/api/idtoken"
 
 	"github.com/GoogleCloudPlatform/golang-samples/run/helloworld/middleware"
+	"github.com/lestrrat-go/jwx/v2/jwt"
 )
 
 const Api1Url = "https://fika-api1-nakagome-wsgwmfbvhq-uc.a.run.app"
@@ -24,23 +25,16 @@ const workflowName = "fs-workflow-nakagome"
 // New sets up our routes and returns a *http.ServeMux
 func New() *http.ServeMux {
 	router := http.NewServeMux()
-
 	// This route is always accessible.
 	router.Handle("/workflow", http.HandlerFunc(workflowHandler))
-
 	// This route is only accessible if the user has a valid access_token.
-	// router.Handle("/api2", middleware.VerifyToekn()(
-	// 	http.HandlerFunc(api2Handler),
-	// ))
 	router.Handle("/api2", middleware.JWTAuthMiddleware(http.HandlerFunc(api2Handler)))
-
 	return router
 }
 
 // BFF → workflow → api1 呼び出し
 func workflowHandler(w http.ResponseWriter, r *http.Request) {
-
-	// Auth0の認証情報を取り出す
+	
 	auth0Token := r.Header.Get("X-Forwarded-Authorization")
 	ctx := context.Background()
 
@@ -71,9 +65,20 @@ func workflowHandler(w http.ResponseWriter, r *http.Request) {
 
 // BFF → api2 呼び出し
 func api2Handler(w http.ResponseWriter, r *http.Request) {
+	
+	// Retrieve the token from the request context
+	tokenString := r.Context().Value("token").(string)
+	fmt.Fprintf(w, "Token retrived from Context: %s\n", tokenString)
+	token, err := jwt.Parse([]byte(tokenString))
+	org_idClaim, ok := token.Get("org_id")
+	if !ok {
+		log.Fatal("org_id claim not found in JWT")
+	}
+	org_id := org_idClaim.(string)
+	log.Printf("org_id: %s\n", org_id)
+		
 	// Auth0の認証情報をそのまま取り出す
 	auth0Token := r.Header.Get("X-Forwarded-Authorization")
-
 	// api2へのAuthorization Headerの引き渡し
 	ctx := context.Background()
 	client, err := idtoken.NewClient(ctx, Api2Url)
