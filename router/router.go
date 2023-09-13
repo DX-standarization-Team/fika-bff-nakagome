@@ -66,27 +66,26 @@ func workflowHandler(w http.ResponseWriter, r *http.Request) {
 
 // BFF → api2 呼び出し
 func api2Handler(w http.ResponseWriter, r *http.Request) {
-	// token := r.Context().Value("token").(jwt.Token)	// .(jwt.Token) 型が含まれていることを確認（型アサーション）
+	
 	
 	// Header での引き渡し
 	auth0Token := r.Header.Get("X-Forwarded-Authorization")
 	// context での引き渡し
-	ctx := context.Background()
-	token := ctx.Value("token").(jwt.Token)
+	// ctx := context.Background()
+	token := r.Context().Value("token").(jwt.Token)	// .(jwt.Token) 型が含まれていることを確認（型アサーション）
 	org_idClaim, ok := token.Get("org_id")
 	if !ok {
 		log.Fatal("org_id claim not found in JWT")
 	}
 	log.Printf("org_id: %s\n", org_idClaim.(string))
-	
-	client, err := idtoken.NewClient(ctx, Api2Url)
-	req, err := http.NewRequestWithContext(ctx, "GET", Api2Url, nil)
+
+	client, err := idtoken.NewClient(r.Context(), Api2Url)
+	req, err := http.NewRequestWithContext(r.Context(), "GET", Api2Url, nil)
 	req.Header.Add("auth0-token", auth0Token)
 	resp, err := client.Do(req)
 	if err != nil {
 		log.Fatalf("%v", err)
 	}
-
 	defer resp.Body.Close()
 
 	// 取得したURLの内容を読み込む
