@@ -66,9 +66,8 @@ func workflowHandler(w http.ResponseWriter, r *http.Request) {
 // BFF → api2 呼び出し
 func api2Handler(w http.ResponseWriter, r *http.Request) {
 	// Retrieve the token from the request context
-	tokenString := r.Context().Value("auth0Token").(string)
-	fmt.Fprintf(w, "Token retrived from Context: %s\n", tokenString)
-	token, err := jwt.Parse([]byte(tokenString))
+	log.Printf("Retrieve the token from the request context")
+	token := r.Context().Value("auth0Token").(jwt.Token)
 	org_idClaim, ok := token.Get("org_id")
 	if !ok {
 		log.Fatal("org_id claim not found in JWT")
