@@ -12,8 +12,6 @@ import (
 	"google.golang.org/api/idtoken"
 
 	"github.com/GoogleCloudPlatform/golang-samples/run/helloworld/middleware"
-
-	"github.com/lestrrat-go/jwx/v2/jwt"
 )
 
 const Api1Url = "https://fika-api1-nakagome-wsgwmfbvhq-uc.a.run.app"
@@ -36,7 +34,7 @@ func New() *http.ServeMux {
 // BFF → workflow → api1 呼び出し
 func workflowHandler(w http.ResponseWriter, r *http.Request) {
 	
-	auth0Token := r.Header.Get("X-Forwarded-Authorization")
+	token := r.Header.Get("X-Forwarded-Authorization")
 	ctx := context.Background()
 
 	// Workflowアクセス用のクライアントライブラリを準備
@@ -51,7 +49,8 @@ func workflowHandler(w http.ResponseWriter, r *http.Request) {
 	req := &executionspb.CreateExecutionRequest{
 		Parent: "projects/" + ProjectId + "/locations/" + Location + "/workflows/" + workflowName,
 		Execution: &executionspb.Execution{
-			Argument: `{"auth0-token":"` + auth0Token + `"}`,
+			// Argument: `{"auth0-token":"` + token + `"}`,
+			Argument: `{"X-Forwarded-Authorization":"` + token + `"}`,
 		},
 	}
 	resp, err := client.CreateExecution(ctx, req)
@@ -68,20 +67,24 @@ func workflowHandler(w http.ResponseWriter, r *http.Request) {
 func api2Handler(w http.ResponseWriter, r *http.Request) {
 	
 	
-	// Header での引き渡し
-	auth0Token := r.Header.Get("X-Forwarded-Authorization")
-	// context での引き渡し
-	// ctx := context.Background()
-	token := r.Context().Value("token").(jwt.Token)	// .(jwt.Token) 型が含まれていることを確認（型アサーション）
-	org_idClaim, ok := token.Get("org_id")
-	if !ok {
-		log.Fatal("org_id claim not found in JWT")
-	}
-	log.Printf("org_id: %s\n", org_idClaim.(string))
-
+	// context に含まれる jwt から org_id を抽出テスト
+	// // ctx := context.Background() ⇒ r.Context() ではうまくいくのに context.Backgroud()なぜか token が取り出せなかった
+	// token := r.Context().Value("token").(jwt.Token)	// .(jwt.Token) 型が含まれていることを確認（型アサーション）
+	// org_idClaim, ok := token.Get("org_id")
+	// if !ok {
+	// 	log.Fatal("org_id claim not found in JWT")
+	// }
+	// log.Printf("org_id: %s\n", org_idClaim.(string))
+	
+	// サービス間認証できる client の作成
 	client, err := idtoken.NewClient(r.Context(), Api2Url)
-	req, err := http.NewRequestWithContext(r.Context(), "GET", Api2Url, nil)
-	req.Header.Add("auth0-token", auth0Token)
+	req, err := http.NewRequest(http.MethodGet, Api2Url, nil)
+	
+	// Header での引き渡し
+	token := r.Header.Get("X-Forwarded-Authorization")
+	// req.Header.Add("auth0-token", token)
+	req.Header.Add("X-Forwarded-Authorization", token)
+
 	resp, err := client.Do(req)
 	if err != nil {
 		log.Fatalf("%v", err)

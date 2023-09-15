@@ -15,39 +15,26 @@ import (
 	"github.com/lestrrat-go/jwx/v2/jwt"
 )
 
-// EnsureValidToken is a middleware that will check the validity of our JWT.
+// JWT の有効性チェックを行うミドルウェア
 func JwtAuthenticationMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		auth0Token := r.Header.Get("X-Forwarded-Authorization")
+		tokenHeader := r.Header.Get("X-Forwarded-Authorization")
 		// 'Bearer '文字列を取り除きトークン検証
 		rep := regexp.MustCompile(`Bearer `)
-		auth0Token = rep.ReplaceAllString(auth0Token, "")
-		token, err := verifyToken(auth0Token)
+		tokenStr := rep.ReplaceAllString(tokenHeader, "")
+		token, err := verifyToken(tokenStr)
 		if err != nil {
 			w.Write([]byte(err.Error()))
 			return
 		}
-		// Store the token in the request context
+		// リクエスト Context にトークンを格納
 		ctx := context.WithValue(r.Context(), "token", token)
-		// Our middleware logic goes here...
-		// next.ServeHTTP(w, r)
+		// 更新済み Context で次の http を呼び出す
 		next.ServeHTTP(w, r.WithContext(ctx))
 	})
 }
 
-
-// tokenから特定のクレーム値を取得する
-func retrieveClaim(token jwt.Token, claim string) interface{} {
-	// Retrieve the token from the request context
-	log.Printf("Retrieve the token from the request context")
-	value, ok := token.Get(claim)
-	if !ok {
-		log.Fatal("org_id claim not found in JWT")
-	}
-	// value := value.(string)
-	return value
-}
-
+// JWT の検証
 func verifyToken(tokenString string) (jwt.Token, error) {
 	// 環境変数読み込み
 	auth0Domain := ""
@@ -57,7 +44,7 @@ func verifyToken(tokenString string) (jwt.Token, error) {
 		log.Printf("Error loading the .env file: %v", err)
 		auth0Domain = "dev-kjqwuq76z8suldgw.us.auth0.com"
 		auth0Audience = "https://fs-apigw-bff-nakagome-bi5axj14.uc.gateway.dev/"
-	}else{
+	} else {
 		auth0Domain = os.Getenv("AUTH0_DOMAIN")
 		auth0Audience = os.Getenv("AUTH0_AUDIENCE")
 	}
@@ -68,7 +55,7 @@ func verifyToken(tokenString string) (jwt.Token, error) {
 		// log.Printf("failed to parse tenant json web keys: err: %v", err)
 		return nil, fmt.Errorf("failed to parse tenant json web keys: err: %v", err)
 	}
-	log.Printf("tenantKeys: %v", tenantKeys.Len())
+	// log.Printf("tenantKeys: %v", tenantKeys.Len())
 	token, err := jwt.Parse(
 		[]byte(tokenString),
 		jwt.WithKeySet(tenantKeys),
