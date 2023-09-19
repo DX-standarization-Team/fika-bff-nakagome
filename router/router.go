@@ -84,10 +84,11 @@ func api2Handler(w http.ResponseWriter, r *http.Request) {
 	// req.Header.Add("auth0-token", token)
 	req.Header.Add("X-Forwarded-Authorization", token)
 	
-	// 冪等キーヘッダ追加
+	// 冪等キーヘッダ追加 
 	idempotentKey := r.Header.Get("Idempotent-Key")
 	req.Header.Add("Idempotent-Key", idempotentKey)
-
+	log.Printf("Idempotent-Key: %s", idempotentKey)
+	
 	resp, err := client.Do(req)
 	if err != nil {
 		log.Fatalf("%v", err)
