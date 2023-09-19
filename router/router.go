@@ -66,7 +66,6 @@ func workflowHandler(w http.ResponseWriter, r *http.Request) {
 // BFF → api2 呼び出し
 func api2Handler(w http.ResponseWriter, r *http.Request) {
 	
-	
 	// context に含まれる jwt から org_id を抽出テスト
 	// // ctx := context.Background() ⇒ r.Context() ではうまくいくのに context.Backgroud()なぜか token が取り出せなかった
 	// token := r.Context().Value("token").(jwt.Token)	// .(jwt.Token) 型が含まれていることを確認（型アサーション）
@@ -80,10 +79,14 @@ func api2Handler(w http.ResponseWriter, r *http.Request) {
 	client, err := idtoken.NewClient(r.Context(), Api2Url)
 	req, err := http.NewRequest(http.MethodGet, Api2Url, nil)
 	
-	// Header での引き渡し
+	// トークンヘッダ追加
 	token := r.Header.Get("X-Forwarded-Authorization")
 	// req.Header.Add("auth0-token", token)
 	req.Header.Add("X-Forwarded-Authorization", token)
+	
+	// 冪等キーヘッダ追加
+	idempotencyKey := r.Header.Get("Idempotency-Key")
+	req.Header.Add("Idempotency-Key", idempotencyKey)
 
 	resp, err := client.Do(req)
 	if err != nil {
