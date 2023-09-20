@@ -83,6 +83,7 @@ func api2Handler(w http.ResponseWriter, r *http.Request) {
 	token := r.Header.Get("X-Forwarded-Authorization")
 	// req.Header.Add("auth0-token", token)
 	req.Header.Add("X-Forwarded-Authorization", token)
+	log.Printf("X-Forwarded-Authorization: %s", token)
 	
 	// 冪等キーヘッダ追加 
 	idempotencyKey := r.Header.Get("Idempotency-Key")
