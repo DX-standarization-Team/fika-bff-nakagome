@@ -95,9 +95,10 @@ func api2Handler(w http.ResponseWriter, r *http.Request) {
 		log.Fatalf("%v", err)
 	}
 	defer resp.Body.Close()
+	log.Printf("Call API2. statuscode: %v, body: %v", resp.StatusCode, resp.Body)
 
-	// 取得したURLの内容を読み込む
+	// API2の処理結果をレスポンスに格納
+	w.WriteHeader(resp.StatusCode)
 	body, _ := io.ReadAll(resp.Body)
-	w.WriteHeader(http.StatusOK)
 	fmt.Fprintf(w, "%s\n", string(body))
 }
