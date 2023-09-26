@@ -11,7 +11,8 @@ import (
 	executionspb "cloud.google.com/go/workflows/executions/apiv1/executionspb"
 	"google.golang.org/api/idtoken"
 
-	"github.com/GoogleCloudPlatform/golang-samples/run/helloworld/middleware"
+	authorization "github.com/DX-standarization-Team/common-service/middleware/authorization"
+	// "github.com/GoogleCloudPlatform/golang-samples/run/helloworld/middleware"
 )
 
 const Api1Url = "https://fika-api1-nakagome-wsgwmfbvhq-uc.a.run.app"
@@ -27,13 +28,13 @@ func New() *http.ServeMux {
 	// This route is always accessible.
 	router.Handle("/workflow", http.HandlerFunc(workflowHandler))
 	// This route is only accessible if the user has a valid access_token.
-	router.Handle("/api2", middleware.JwtAuthenticationMiddleware(http.HandlerFunc(api2Handler)))
+	router.Handle("/api2", authorization.JwtAuthenticationMiddleware(http.HandlerFunc(api2Handler)))
 	return router
 }
 
 // BFF → workflow → api1 呼び出し
 func workflowHandler(w http.ResponseWriter, r *http.Request) {
-	
+
 	token := r.Header.Get("X-Forwarded-Authorization")
 	ctx := context.Background()
 
@@ -65,7 +66,7 @@ func workflowHandler(w http.ResponseWriter, r *http.Request) {
 
 // BFF → api2 呼び出し
 func api2Handler(w http.ResponseWriter, r *http.Request) {
-	
+
 	// context に含まれる jwt から org_id を抽出テスト
 	// // ctx := context.Background() ⇒ r.Context() ではうまくいくのに context.Backgroud()なぜか token が取り出せなかった
 	// token := r.Context().Value("token").(jwt.Token)	// .(jwt.Token) 型が含まれていることを確認（型アサーション）
@@ -74,22 +75,22 @@ func api2Handler(w http.ResponseWriter, r *http.Request) {
 	// 	log.Fatal("org_id claim not found in JWT")
 	// }
 	// log.Printf("org_id: %s\n", org_idClaim.(string))
-	
+
 	// サービス間認証できる client の作成
 	client, err := idtoken.NewClient(r.Context(), Api2Url)
 	req, err := http.NewRequest(http.MethodGet, Api2Url, nil)
-	
+
 	// トークンヘッダ追加
 	token := r.Header.Get("X-Forwarded-Authorization")
 	// req.Header.Add("auth0-token", token)
 	req.Header.Add("X-Forwarded-Authorization", token)
 	log.Printf("X-Forwarded-Authorization: %s", token)
-	
-	// 冪等キーヘッダ追加 
+
+	// 冪等キーヘッダ追加
 	idempotencyKey := r.Header.Get("Idempotency-Key")
 	req.Header.Add("Idempotency-Key", idempotencyKey)
 	log.Printf("Idempotency-Key: %s", idempotencyKey)
-	
+
 	resp, err := client.Do(req)
 	if err != nil {
 		log.Fatalf("%v", err)
