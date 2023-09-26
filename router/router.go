@@ -12,7 +12,6 @@ import (
 	"google.golang.org/api/idtoken"
 
 	authorization "github.com/DX-standarization-Team/common-service/middleware/authorization"
-	// "github.com/GoogleCloudPlatform/golang-samples/run/helloworld/middleware"
 )
 
 const Api1Url = "https://fika-api1-nakagome-wsgwmfbvhq-uc.a.run.app"
