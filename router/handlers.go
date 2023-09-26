@@ -49,7 +49,7 @@ func workflowHandler(w http.ResponseWriter, r *http.Request) {
 // BFF → api2 呼び出し
 func api2Handler(w http.ResponseWriter, r *http.Request) {
 	orgId := authorization.GetOrgId(r)
-	log.Printf("api2Handler")
+	log.Printf("api2Handler was called")
 	log.Printf("orgId: %s", orgId)
 	// context に含まれる jwt から org_id を抽出テスト
 	// ctx := context.Background() ⇒ r.Context() ではうまくいくのに context.Backgroud()なぜか token が取り出せなかった
