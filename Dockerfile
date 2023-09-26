@@ -8,7 +8,10 @@ WORKDIR /app
 # Expecting to copy go.mod and if present go.sum.
 COPY go.* ./
 RUN go mod download
- 
+
+
+RUN git config --global url."https://gitlab+deploy-token-133390:SE-R7CFeqwT13kSmxeGj@gitlab.com/DX-standarization-Team/common-service".insteadOf "https://gitlab.com/DX-standarization-Team/common-service"
+
 # Copy local code to the container image.
 COPY . ./
  
