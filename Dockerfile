@@ -13,7 +13,6 @@ RUN echo "set GOPRIVATE, GONOPROXY, GONOSUMDB: github.com/DX-standarization-Team
 RUN export GOPRIVATE=github.com/DX-standarization-Team/common-service
 RUN export GONOPROXY=github.com/DX-standarization-Team/common-service
 RUN export GONOSUMDB=github.com/DX-standarization-Team/common-service
-RUN export GO111MODULE=on
 # ENV GOPRIVATE=github.com/DX-standarization-Team/common-service
 # ENV GONOPROXY=github.com/DX-standarization-Team/common-service
 # ENV GONOSUMDB=github.com/DX-standarization-Team/common-service
@@ -29,6 +28,7 @@ RUN git config --global url."https://x-access-token:${TOKEN}@github.com/DX-stand
 # SSH version
 # RUN git config --global url."ssh://git@github.com".insteadOf "https://github.com"
 
+RUN go clean --modcache
 RUN go mod download
 
 # Copy local code to the container image.
