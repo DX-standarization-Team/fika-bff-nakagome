@@ -12,7 +12,6 @@ env:
   SERVICE_NAME: fika-bff-nakagome
   PORT: 8080
   GCP_REGION: us-central1
-  ACCESS_TOKEN_PRIVATE_REPO: ${{ secrets.ACCESS_TOKEN_PRIVATE_REPO }}
   # USER_NAME: scsk-nakagome
   # USER_NAME: githubmn324
 
@@ -20,9 +19,6 @@ jobs:
   deploy:
     # if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
-    env:
-      GOPRIVATE: github.com/DX-standarization-Team/common-service-v2
-      GONOSUMDB: github.com/DX-standarization-Team/common-service-v2
     steps:
       # リポジトリをチェックアウト
       - name: "Checkout the repository"
@@ -60,7 +56,10 @@ jobs:
       # Docker イメージを作成
       - name: "Build a docker image"
         # run: docker build -t $IMAGE . --no-cache --build-arg TOKEN=${{ steps.generate_token.outputs.token }}
-        run: docker build -t $IMAGE . --build-arg ACCESS_TOKEN_PRIVATE_REPO=$ACCESS_TOKEN_PRIVATE_REPO
+        env:
+          ACCESS_TOKEN_PRIVATE_REPO: ${{ secrets.ACCESS_TOKEN_PRIVATE_REPO }}
+        run: docker build -t $IMAGE .
+        # run: docker build -t $IMAGE . --build-arg ACCESS_TOKEN_PRIVATE_REPO=${{ secrets.ACCESS_TOKEN_PRIVATE_REPO }}
         # run: docker build -t $IMAGE . --build-arg ACCESS_TOKEN_PRIVATE_REPO=$ACCESS_TOKEN_PRIVATE_REPO --build-arg USER_NAME=$USER_NAME
 
       # Docker イメージを Container Registry に Push

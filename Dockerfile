@@ -13,6 +13,7 @@ COPY go.* ./
 ENV GOPRIVATE=github.com/DX-standarization-Team/common-service-v2
 ENV GONOPROXY=github.com/DX-standarization-Team/common-service-v2
 ENV GONOSUMDB=github.com/DX-standarization-Team/common-service-v2
+ENV GOPROXY=direct
 RUN echo $GOPRIVATE
 
 # ARG TOKEN
