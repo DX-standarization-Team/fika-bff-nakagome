@@ -10,7 +10,7 @@ import (
 	executions "cloud.google.com/go/workflows/executions/apiv1"
 	executionspb "cloud.google.com/go/workflows/executions/apiv1/executionspb"
 
-	authorization "github.com/DX-standarization-Team/common-service/middleware/authorization"
+	// authorization "github.com/DX-standarization-Team/common-service/middleware/authorization"
 	"google.golang.org/api/idtoken"
 )
 
@@ -49,9 +49,9 @@ func workflowHandler(w http.ResponseWriter, r *http.Request) {
 // BFF → api2 呼び出し
 func api2Handler(w http.ResponseWriter, r *http.Request) {
 
-	log.Printf("api2Handler was called")
-	orgId := authorization.GetOrgId(r)
-	log.Printf("orgId: %s", orgId)
+	// log.Printf("api2Handler was called")
+	// orgId := authorization.GetOrgId(r)
+	// log.Printf("orgId: %s", orgId)
 	// context に含まれる jwt から org_id を抽出テスト
 	// ctx := context.Background() ⇒ r.Context() ではうまくいくのに context.Backgroud()なぜか token が取り出せなかった
 
