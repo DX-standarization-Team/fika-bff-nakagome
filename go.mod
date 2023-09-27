@@ -4,7 +4,7 @@ go 1.13
 
 require (
 	cloud.google.com/go/workflows v1.12.0
-	github.com/DX-standarization-Team/common-service v0.0.0
+	github.com/DX-standarization-Team/common-service v1.0.2
 	github.com/joho/godotenv v1.5.1
 	github.com/lestrrat-go/jwx/v2 v2.0.13
 	google.golang.org/api v0.143.0
