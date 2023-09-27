@@ -13,6 +13,8 @@ RUN echo "set GOPRIVATE, GONOPROXY, GONOSUMDB: github.com/DX-standarization-Team
 RUN export GOPRIVATE=github.com/DX-standarization-Team/common-service
 RUN export GONOPROXY=github.com/DX-standarization-Team/common-service
 RUN export GONOSUMDB=github.com/DX-standarization-Team/common-service
+# RUN export GO111MODULE=on
+# RUN export GOPROXY=direct
 # ENV GOPRIVATE=github.com/DX-standarization-Team/common-service
 # ENV GONOPROXY=github.com/DX-standarization-Team/common-service
 # ENV GONOSUMDB=github.com/DX-standarization-Team/common-service
