@@ -14,15 +14,15 @@ COPY go.* ./
 # RUN export GONOPROXY=github.com/DX-standarization-Team/common-service-v2
 # RUN export GONOSUMDB=github.com/DX-standarization-Team/common-service-v2
 
-ARG TOKEN
-RUN git config --global url."https://x-access-token:${TOKEN}@github.com/DX-standarization-Team/common-service-v2/".insteadOf "https://github.com/DX-standarization-Team/common-service-v2/"
+# ARG TOKEN
+# RUN git config --global url."https://x-access-token:${TOKEN}@github.com/DX-standarization-Team/common-service-v2/".insteadOf "https://github.com/DX-standarization-Team/common-service-v2/"
 # RUN git config --global url."https://x-access-token:${TOKEN}@github.com/".insteadOf "https://github.com/"
 
 # ACCESS TOKEN version
-# ARG ACCESS_TOKEN_PRIVATE_REPO
-# ARG USER_NAME
-# RUN echo "git config set. USER_NAME: $USER_NAME"
-# RUN git config --global url."https://$USER_NAME:$ACCESS_TOKEN_PRIVATE_REPO:x-oauth-basic@github.com/DX-standarization-Team/common-service-v2/".insteadOf "https://github.com/DX-standarization-Team/common-service-v2/"
+ARG ACCESS_TOKEN_PRIVATE_REPO
+ARG USER_NAME
+RUN echo "git config set. USER_NAME: $USER_NAME"
+RUN git config --global url."https://$USER_NAME:$ACCESS_TOKEN_PRIVATE_REPO:x-oauth-basic@github.com/DX-standarization-Team/common-service-v2/".insteadOf "https://github.com/DX-standarization-Team/common-service-v2/"
 # RUN git config --global url."https://$ACCESS_TOKEN_PRIVATE_REPO:x-oauth-basic@github.com/DX-standarization-Team/common-service-v2/".insteadOf "https://github.com/DX-standarization-Team/common-service-v2/"
 
 # SSH version
