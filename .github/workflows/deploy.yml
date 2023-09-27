@@ -19,6 +19,9 @@ jobs:
   deploy:
     # if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
+    env:
+      GOPRIVATE: github.com/DX-standarization-Team/common-service-v2
+      GONOSUMDB: github.com/DX-standarization-Team/common-service-v2
     steps:
       # リポジトリをチェックアウト
       - name: "Checkout the repository"

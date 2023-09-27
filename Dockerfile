@@ -9,14 +9,14 @@ WORKDIR /app
 COPY go.* ./
 
 # Set Private repository access
-RUN echo "set GOPRIVATE, GONOPROXY, GONOSUMDB: github.com/DX-standarization-Team/common-service-v2"
-RUN export GOPRIVATE=github.com/DX-standarization-Team/common-service-v2
-RUN export GONOPROXY=github.com/DX-standarization-Team/common-service-v2
-RUN export GONOSUMDB=github.com/DX-standarization-Team/common-service-v2
+# RUN echo "set GOPRIVATE, GONOPROXY, GONOSUMDB: github.com/DX-standarization-Team/common-service-v2"
+# RUN export GOPRIVATE=github.com/DX-standarization-Team/common-service-v2
+# RUN export GONOPROXY=github.com/DX-standarization-Team/common-service-v2
+# RUN export GONOSUMDB=github.com/DX-standarization-Team/common-service-v2
 
 ARG TOKEN
-# RUN git config --global url."https://x-access-token:${TOKEN}@github.com/DX-standarization-Team/common-service-v2/".insteadOf "https://github.com/DX-standarization-Team/common-service-v2/"
-RUN git config --global url."https://x-access-token:${TOKEN}@github.com/".insteadOf "https://github.com/"
+RUN git config --global url."https://x-access-token:${TOKEN}@github.com/DX-standarization-Team/common-service-v2/".insteadOf "https://github.com/DX-standarization-Team/common-service-v2/"
+# RUN git config --global url."https://x-access-token:${TOKEN}@github.com/".insteadOf "https://github.com/"
 
 # ACCESS TOKEN version
 # ARG ACCESS_TOKEN_PRIVATE_REPO
