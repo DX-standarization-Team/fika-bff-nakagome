@@ -14,11 +14,11 @@ RUN echo "GOPRIVATE set: $GOPRIVATE"
 ENV GONOPROXY=github.com/DX-standarization-Team/common-service
 RUN echo "GONOPROXY set: $GOPRIVATE"
 
-# ARG ACCESS_TOKEN_PRIVATE_REPO
-# ARG USER_NAME
-# RUN echo "git config set. USER_NAME: $USER_NAME"
-# RUN git config --global url."https://$USER_NAME:$ACCESS_TOKEN_PRIVATE_REPO:x-oauth-basic@github.com/DX-standarization-Team/common-service/".insteadOf "https://github.com/DX-standarization-Team/common-service/"
-RUN git config --global url."ssh://git@github.com".insteadOf "https://github.com"
+ARG ACCESS_TOKEN_PRIVATE_REPO
+ARG USER_NAME
+RUN echo "git config set. USER_NAME: $USER_NAME"
+RUN git config --global url."https://$USER_NAME:$ACCESS_TOKEN_PRIVATE_REPO:x-oauth-basic@github.com/DX-standarization-Team/common-service/".insteadOf "https://github.com/DX-standarization-Team/common-service/"
+# RUN git config --global url."ssh://git@github.com".insteadOf "https://github.com"
 
 RUN go mod download
 
