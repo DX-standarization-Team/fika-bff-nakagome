@@ -28,9 +28,9 @@ RUN git config --global url."https://x-access-token:${TOKEN}@github.com/".instea
 # SSH version
 # RUN git config --global url."ssh://git@github.com".insteadOf "https://github.com"
 
-# RUN go clean --modcache
+RUN go clean --modcache
 RUN go mod download
-RUN go mod tidy
+RUN go get github.com/DX-standarization-Team/common-service@v1.0.2
 
 # Copy local code to the container image.
 COPY . ./
