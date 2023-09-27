@@ -3,7 +3,7 @@ package router
 import (
 	"net/http"
 
-	authorization "github.com/DX-standarization-Team/common-service/middleware/authorization"
+	authorization "github.com/DX-standarization-Team/common-service-v2/middleware/authorization"
 )
 
 const (

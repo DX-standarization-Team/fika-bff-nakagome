@@ -10,7 +10,7 @@ import (
 	executions "cloud.google.com/go/workflows/executions/apiv1"
 	executionspb "cloud.google.com/go/workflows/executions/apiv1/executionspb"
 
-	authorization "github.com/DX-standarization-Team/common-service/middleware/authorization"
+	authorization "github.com/DX-standarization-Team/common-service-v2/middleware/authorization"
 	"google.golang.org/api/idtoken"
 )
 

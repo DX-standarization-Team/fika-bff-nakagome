@@ -9,27 +9,26 @@ WORKDIR /app
 COPY go.* ./
 
 # Set Private repository access
-RUN echo "set GOPRIVATE, GONOPROXY, GONOSUMDB: github.com/DX-standarization-Team/common-service"
-RUN export GOPRIVATE=github.com/DX-standarization-Team/common-service
-RUN export GONOPROXY=github.com/DX-standarization-Team/common-service
-RUN export GONOSUMDB=github.com/DX-standarization-Team/common-service
+RUN echo "set GOPRIVATE, GONOPROXY, GONOSUMDB: github.com/DX-standarization-Team/common-service-v2"
+RUN export GOPRIVATE=github.com/DX-standarization-Team/common-service-v2
+RUN export GONOPROXY=github.com/DX-standarization-Team/common-service-v2
+RUN export GONOSUMDB=github.com/DX-standarization-Team/common-service-v2
 
-ARG TOKEN
-# RUN git config --global url."https://x-access-token:${TOKEN}@github.com/DX-standarization-Team/common-service/".insteadOf "https://github.com/DX-standarization-Team/common-service/"
-RUN git config --global url."https://x-access-token:${TOKEN}@github.com/".insteadOf "https://github.com/"
+# ARG TOKEN
+# RUN git config --global url."https://x-access-token:${TOKEN}@github.com/DX-standarization-Team/common-service-v2/".insteadOf "https://github.com/DX-standarization-Team/common-service-v2/"
+# RUN git config --global url."https://x-access-token:${TOKEN}@github.com/".insteadOf "https://github.com/"
 
 # ACCESS TOKEN version
 # ARG ACCESS_TOKEN_PRIVATE_REPO
-# ARG USER_NAME
-# RUN echo "git config set. USER_NAME: $USER_NAME"
-# RUN git config --global url."https://$USER_NAME:$ACCESS_TOKEN_PRIVATE_REPO:x-oauth-basic@github.com/DX-standarization-Team/common-service/".insteadOf "https://github.com/DX-standarization-Team/common-service/"
+ARG USER_NAME
+RUN echo "git config set. USER_NAME: $USER_NAME"
+RUN git config --global url."https://$USER_NAME:$ACCESS_TOKEN_PRIVATE_REPO:x-oauth-basic@github.com/DX-standarization-Team/common-service-v2/".insteadOf "https://github.com/DX-standarization-Team/common-service-v2/"
 
 # SSH version
 # RUN git config --global url."ssh://git@github.com".insteadOf "https://github.com"
 
-RUN go clean --modcache
 RUN go mod download
-RUN go install github.com/DX-standarization-Team/common-service@v1.0.2
+# RUN go install github.com/DX-standarization-Team/common-service-v2@v0.1.0
 
 # Copy local code to the container image.
 COPY . ./
