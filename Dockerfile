@@ -16,9 +16,9 @@ ENV GONOSUMDB=github.com/DX-standarization-Team/common-service-v2
 # ENV GOPROXY=direct
 RUN echo $GOPRIVATE
 
-# ARG TOKEN
+ARG TOKEN
 # RUN git config --global url."https://x-access-token:${TOKEN}@github.com/DX-standarization-Team/common-service-v2/".insteadOf "https://github.com/DX-standarization-Team/common-service-v2/"
-# RUN git config --global url."https://x-access-token:${TOKEN}@github.com/".insteadOf "https://github.com/"
+RUN git config --global url."https://x-access-token:${TOKEN}@github.com/".insteadOf "https://github.com/"
 
 # ACCESS TOKEN version
 # ARG ACCESS_TOKEN_PRIVATE_REPO
@@ -26,7 +26,6 @@ RUN echo $GOPRIVATE
 # RUN echo "git config set. USER_NAME: $USER_NAME"
 # RUN git config --global url."https://$USER_NAME:$ACCESS_TOKEN_PRIVATE_REPO:x-oauth-basic@github.com/DX-standarization-Team/common-service-v2/".insteadOf "https://github.com/DX-standarization-Team/common-service-v2/"
 # RUN git config --global url."https://$ACCESS_TOKEN_PRIVATE_REPO:x-oauth-basic@github.com/DX-standarization-Team/common-service-v2/".insteadOf "https://github.com/DX-standarization-Team/common-service-v2/"
-RUN git config --global url."https://x-access-token:${ACCESS_TOKEN_PRIVATE_REPO}@github.com/".insteadOf "https://github.com/"
 
 # SSH version
 # RUN git config --global url."ssh://git@github.com".insteadOf "https://github.com"
