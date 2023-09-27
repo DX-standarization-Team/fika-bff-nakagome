@@ -10,5 +10,5 @@ require (
 	google.golang.org/genproto v0.0.0-20230920204549-e6e6cdab5c13 // indirect
 	google.golang.org/genproto/googleapis/api v0.0.0-20230920204549-e6e6cdab5c13 // indirect
 	google.golang.org/grpc v1.58.2 // indirect
-	github.com/DX-standarization-Team/common-service-v2 v0.1.0
+	github.com/DX-standarization-Team/common-service-v2 v0.1.1
 )
