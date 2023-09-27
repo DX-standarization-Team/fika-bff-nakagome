@@ -30,6 +30,7 @@ RUN git config --global url."https://x-access-token:${TOKEN}@github.com/".instea
 
 # RUN go clean --modcache
 RUN go mod download
+RUN go mod tidy
 
 # Copy local code to the container image.
 COPY . ./
