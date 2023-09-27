@@ -17,6 +17,7 @@ RUN export GONOSUMDB=github.com/DX-standarization-Team/common-service
 # ENV GONOPROXY=github.com/DX-standarization-Team/common-service
 # ENV GONOSUMDB=github.com/DX-standarization-Team/common-service
 
+# ACCESS TOKEN version
 # ARG ACCESS_TOKEN_PRIVATE_REPO
 # ARG USER_NAME
 # RUN echo "git config set. USER_NAME: $USER_NAME"
