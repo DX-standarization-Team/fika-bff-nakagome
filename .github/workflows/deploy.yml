@@ -38,10 +38,17 @@ jobs:
       - name: "Configure docker to use the gcloud cli"
         run: gcloud auth configure-docker --quiet
 
+      # Docker に .netrc の設定をする
+      - name: Create .nettrc setting file
+        uses: little-core-labs/netrc-creds@master
+        with:
+          machine: github.com
+          login: $USER_NAME
+          password: $ACCESS_TOKEN_PRIVATE_REPO
+
       # Docker イメージを作成
       - name: "Build a docker image"
-        # run: docker build -t $IMAGE . --build-arg ACCESS_TOKEN_PRIVATE_REPO=$ACCESS_TOKEN_PRIVATE_REPO --build-arg USER_NAME=$USER_NAME
-        run: docker build -t $IMAGE .
+        run: docker build -t $IMAGE . --build-arg ACCESS_TOKEN_PRIVATE_REPO=$ACCESS_TOKEN_PRIVATE_REPO --build-arg USER_NAME=$USER_NAME
 
       # Docker イメージを Container Registry に Push
       - name: "Push the docker image to Container Registry"
