@@ -10,10 +10,13 @@ COPY go.* ./
 
 # Set Private repository access
 # RUN echo "set GOPRIVATE, GONOPROXY, GONOSUMDB: github.com/DX-standarization-Team/common-service-v2"
-RUN export GOPRIVATE=github.com/DX-standarization-Team/common-service-v2
+# RUN export GOPRIVATE=github.com/DX-standarization-Team/common-service-v2
 # RUN export GONOPROXY=github.com/DX-standarization-Team/common-service-v2
-RUN export GONOSUMDB=github.com/DX-standarization-Team/common-service-v2
-RUN echo "set GOPRIVATE"
+# RUN export GONOSUMDB=github.com/DX-standarization-Team/common-service-v2
+
+ENV GOPRIVATE=github.com/DX-standarization-Team/common-service-v2
+ENV GONOPROXY=github.com/DX-standarization-Team/common-service-v2
+ENV GONOSUMDB=github.com/DX-standarization-Team/common-service-v2
 RUN echo $GOPRIVATE
 
 ARG TOKEN
