@@ -30,7 +30,7 @@ RUN git config --global url."https://x-access-token:${TOKEN}@github.com/".instea
 
 RUN go clean --modcache
 RUN go mod download
-RUN go get github.com/DX-standarization-Team/common-service@v1.0.2
+RUN go install github.com/DX-standarization-Team/common-service@v1.0.2
 
 # Copy local code to the container image.
 COPY . ./
