@@ -10,10 +10,12 @@ COPY go.* ./
 
 # Set Private repository access
 ENV GOPRIVATE=github.com/DX-standarization-Team/common-service
+ENV GONOPROXY=github.com/DX-standarization-Team/common-service
 
 ARG ACCESS_TOKEN_PRIVATE_REPO
 
 RUN echo $GOPRIVATE
+RUN echo $GONOPROXY
 RUN echo $ACCESS_TOKEN_PRIVATE_REPO
 RUN git config --global url."https://${ACCESS_TOKEN_PRIVATE_REPO}:x-oauth-basic@github.com/DX-standarization-Team/common-service/".insteadOf "https://github.com/DX-standarization-Team/common-service/"
 
