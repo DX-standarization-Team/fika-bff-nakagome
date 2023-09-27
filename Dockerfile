@@ -13,6 +13,7 @@ COPY go.* ./
 ENV GOPRIVATE=github.com/DX-standarization-Team/common-service-v2
 ENV GONOPROXY=github.com/DX-standarization-Team/common-service-v2
 ENV GONOSUMDB=github.com/DX-standarization-Team/common-service-v2
+ENV GOSUMDB=off
 # ENV GOPROXY=direct
 RUN echo $GOPRIVATE
 
@@ -31,7 +32,6 @@ RUN git config --global url."https://x-access-token:${TOKEN}@github.com/".instea
 # RUN git config --global url."ssh://git@github.com".insteadOf "https://github.com"
 
 RUN go mod download
-RUN go install github.com/DX-standarization-Team/common-service-v2@v0.1.3
 
 # Copy local code to the container image.
 COPY . ./
