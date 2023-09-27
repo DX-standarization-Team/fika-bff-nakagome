@@ -1,5 +1,4 @@
 FROM golang:1.17-buster as builder
-# FROM golang:1.18
  
 # Create and change to the app directory.
 WORKDIR /app
@@ -29,7 +28,7 @@ RUN git config --global url."https://x-access-token:${TOKEN}@github.com/".instea
 # SSH version
 # RUN git config --global url."ssh://git@github.com".insteadOf "https://github.com"
 
-RUN go clean --modcache
+# RUN go clean --modcache
 RUN go mod download
 
 # Copy local code to the container image.
