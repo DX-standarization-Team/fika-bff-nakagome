@@ -8,7 +8,7 @@ WORKDIR /app
 # Expecting to copy go.mod and if present go.sum.
 COPY go.* ./
 
-# Set private repository access
+# Set Private repository access
 ENV GOPRIVATE=github.com/DX-standarization-Team/common-service
 ARG ACCESS_TOKEN_PRIVATE_REPO
 RUN git config --global url."https://${ACCESS_TOKEN_PRIVATE_REPO}:x-oauth-basic@github.com/DX-standarization-Team/common-service/".insteadOf "https://github.com/DX-standarization-Team/common-service/"
