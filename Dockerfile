@@ -1,4 +1,5 @@
-FROM golang:1.17-buster as builder
+# FROM golang:1.17-buster as builder
+FROM golang:1.18
  
 # Create and change to the app directory.
 WORKDIR /app
@@ -10,20 +11,20 @@ COPY go.* ./
 
 # Set Private repository access
 RUN echo "set GOPRIVATE, GONOPROXY, GONOSUMDB: github.com/DX-standarization-Team/common-service"
-RUN export GOPRIVATE=github.com/DX-standarization-Team/common-service
+# RUN export GOPRIVATE=github.com/DX-standarization-Team/common-service
+RUN export GOPRIVATE=github.com/DX-standarization-Team
 RUN export GONOPROXY=github.com/DX-standarization-Team/common-service
 RUN export GONOSUMDB=github.com/DX-standarization-Team/common-service
-# ENV GOPRIVATE=github.com/DX-standarization-Team/common-service
-# ENV GONOPROXY=github.com/DX-standarization-Team/common-service
-# ENV GONOSUMDB=github.com/DX-standarization-Team/common-service
+
+ARG TOKEN
+# RUN git config --global url."https://x-access-token:${TOKEN}@github.com/DX-standarization-Team/common-service/".insteadOf "https://github.com/DX-standarization-Team/common-service/"
+RUN git config --global url."https://x-access-token:${TOKEN}@github.com/".insteadOf "https://github.com/"
 
 # ACCESS TOKEN version
 # ARG ACCESS_TOKEN_PRIVATE_REPO
 # ARG USER_NAME
 # RUN echo "git config set. USER_NAME: $USER_NAME"
 # RUN git config --global url."https://$USER_NAME:$ACCESS_TOKEN_PRIVATE_REPO:x-oauth-basic@github.com/DX-standarization-Team/common-service/".insteadOf "https://github.com/DX-standarization-Team/common-service/"
-ARG TOKEN
-RUN git config --global url."https://x-access-token:${TOKEN}@github.com/DX-standarization-Team/common-service/".insteadOf "https://github.com/DX-standarization-Team/common-service/"
 
 # SSH version
 # RUN git config --global url."ssh://git@github.com".insteadOf "https://github.com"
