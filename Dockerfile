@@ -1,5 +1,5 @@
-# FROM golang:1.17-buster as builder
-FROM golang:1.18
+FROM golang:1.17-buster as builder
+# FROM golang:1.18
  
 # Create and change to the app directory.
 WORKDIR /app
