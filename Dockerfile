@@ -13,6 +13,8 @@ ENV GOPRIVATE=github.com/DX-standarization-Team/common-service
 RUN echo "GOPRIVATE set: $GOPRIVATE"
 ENV GONOPROXY=github.com/DX-standarization-Team/common-service
 RUN echo "GONOPROXY set: $GOPRIVATE"
+ENV GONOSUMDB=github.com/DX-standarization-Team/common-service
+RUN echo "GONOSUMDB set: $GONOSUMDB"
 
 ARG ACCESS_TOKEN_PRIVATE_REPO
 ARG USER_NAME
