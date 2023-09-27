@@ -1,32 +1,23 @@
 name: Deploy
 
 on:
-  pull_request:
+  push:
     branches:
       - develop
-    types: [closed]
 
 env:
   GCP_CREDENTIALS: ${{ secrets.GCP_CREDENTIALS }}
   GCP_PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
   IMAGE: gcr.io/${{ secrets.GCP_PROJECT_ID }}/test-image:${{ github.sha }}
   SERVICE_NAME: fika-bff-nakagome
-  PORT: 80
+  PORT: 8080
   GCP_REGION: us-central1
   ACCESS_TOKEN_PRIVATE_REPO: ${{ secrets.ACCESS_TOKEN_PRIVATE_REPO }}
 
 jobs:
-  #  if_merged:
-  #    if: github.event.pull_request.merged == true
-  #    runs-on: ubuntu-latest
-  #    steps:
-  #    - run: |
-  #        echo The PR was merged
   deploy:
-    if: github.event.pull_request.merged == true
+    # if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
-    environment:
-      name: ${{ github.ref }}
     steps:
       # リポジトリをチェックアウト
       - name: "Checkout the repository"

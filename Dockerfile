@@ -7,10 +7,11 @@ WORKDIR /app
 # This allows the container build to reuse cached dependencies.
 # Expecting to copy go.mod and if present go.sum.
 COPY go.* ./
+
+ARG ACCESS_TOKEN_PRIVATE_REPO
+RUN git config --global url."https://${ACCESS_TOKEN_PRIVATE_REPO}:x-oauth-basic@github.com/DX-standarization-Team/common-service/".insteadOf "https://github.com/DX-standarization-Team/common-service/"
+
 RUN go mod download
-
-
-RUN git config --global url."https://gitlab+deploy-token-133390:SE-R7CFeqwT13kSmxeGj@gitlab.com/DX-standarization-Team/common-service".insteadOf "https://gitlab.com/DX-standarization-Team/common-service"
 
 # Copy local code to the container image.
 COPY . ./
