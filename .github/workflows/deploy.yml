@@ -40,7 +40,8 @@ jobs:
 
       # Docker イメージを作成
       - name: "Build a docker image"
-        run: docker build -t $IMAGE . --build-arg ACCESS_TOKEN_PRIVATE_REPO=$ACCESS_TOKEN_PRIVATE_REPO --build-arg USER_NAME=$USER_NAME
+        # run: docker build -t $IMAGE . --build-arg ACCESS_TOKEN_PRIVATE_REPO=$ACCESS_TOKEN_PRIVATE_REPO --build-arg USER_NAME=$USER_NAME
+        run: docker build -t $IMAGE .
 
       # Docker イメージを Container Registry に Push
       - name: "Push the docker image to Container Registry"
