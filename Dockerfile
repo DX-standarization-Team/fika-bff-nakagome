@@ -9,7 +9,7 @@ WORKDIR /app
 COPY go.* ./
 
 # Set Private repository access
-RUN echo "set GOPRIVATE, GONOPROXY, GONOSUMDB: $GOPRIVATE"
+RUN echo "set GOPRIVATE, GONOPROXY, GONOSUMDB: github.com/DX-standarization-Team/common-service"
 RUN export GOPRIVATE=github.com/DX-standarization-Team/common-service
 RUN export GONOPROXY=github.com/DX-standarization-Team/common-service
 RUN export GONOSUMDB=github.com/DX-standarization-Team/common-service
@@ -22,6 +22,7 @@ RUN export GONOSUMDB=github.com/DX-standarization-Team/common-service
 # ARG USER_NAME
 # RUN echo "git config set. USER_NAME: $USER_NAME"
 # RUN git config --global url."https://$USER_NAME:$ACCESS_TOKEN_PRIVATE_REPO:x-oauth-basic@github.com/DX-standarization-Team/common-service/".insteadOf "https://github.com/DX-standarization-Team/common-service/"
+ARG TOKEN
 RUN git config --global url."https://x-access-token:${TOKEN}@github.com/DX-standarization-Team/common-service/".insteadOf "https://github.com/DX-standarization-Team/common-service/"
 
 # SSH version
