@@ -13,7 +13,8 @@ COPY go.* ./
 RUN export GOPRIVATE=github.com/DX-standarization-Team/common-service-v2
 # RUN export GONOPROXY=github.com/DX-standarization-Team/common-service-v2
 RUN export GONOSUMDB=github.com/DX-standarization-Team/common-service-v2
-RUN echo "set GOPRIVATE:${GOPRIVATE}"
+RUN echo "set GOPRIVATE"
+RUN echo $GOPRIVATE
 
 ARG TOKEN
 RUN git config --global url."https://x-access-token:${TOKEN}@github.com/DX-standarization-Team/common-service-v2/".insteadOf "https://github.com/DX-standarization-Team/common-service-v2/"
