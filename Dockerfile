@@ -12,8 +12,8 @@ COPY go.* ./
 RUN echo "set GOPRIVATE, GONOPROXY, GONOSUMDB: github.com/DX-standarization-Team/common-service"
 # RUN export GOPRIVATE=github.com/DX-standarization-Team/common-service
 RUN export GOPRIVATE=github.com/DX-standarization-Team
-RUN export GONOPROXY=github.com/DX-standarization-Team/common-service
-RUN export GONOSUMDB=github.com/DX-standarization-Team/common-service
+# RUN export GONOPROXY=github.com/DX-standarization-Team/common-service
+# RUN export GONOSUMDB=github.com/DX-standarization-Team/common-service
 
 ARG TOKEN
 # RUN git config --global url."https://x-access-token:${TOKEN}@github.com/DX-standarization-Team/common-service/".insteadOf "https://github.com/DX-standarization-Team/common-service/"
