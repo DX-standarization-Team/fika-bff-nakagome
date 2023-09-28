@@ -8,17 +8,17 @@ WORKDIR /app
 # Expecting to copy go.mod and if present go.sum.
 COPY go.* ./
 
-# Set Private repository access
-# RUN echo "set GOPRIVATE, GONOPROXY, GONOSUMDB: github.com/DX-standarization-Team/common-service-v2"
-ENV GOPRIVATE=github.com/DX-standarization-Team/common-service-v2
-ENV GONOPROXY=github.com/DX-standarization-Team/common-service-v2
-ENV GONOSUMDB=github.com/DX-standarization-Team/common-service-v2
-ENV GOSUMDB=off
-# ENV GOPROXY=direct
-RUN echo $GOPRIVATE
+# # Set Private repository access
+# # RUN echo "set GOPRIVATE, GONOPROXY, GONOSUMDB: github.com/DX-standarization-Team/common-service-v2"
+# ENV GOPRIVATE=github.com/DX-standarization-Team/common-service-v2
+# ENV GONOPROXY=github.com/DX-standarization-Team/common-service-v2
+# ENV GONOSUMDB=github.com/DX-standarization-Team/common-service-v2
+# # ENV GOSUMDB=off
+# # ENV GOPROXY=direct
+# RUN echo $GOPRIVATE
 
-ARG TOKEN
-RUN git config --global url."https://x-access-token:${TOKEN}@github.com/DX-standarization-Team/common-service-v2".insteadOf "https://github.com/DX-standarization-Team/common-service-v2"
+# ARG TOKEN
+# RUN git config --global url."https://x-access-token:${TOKEN}@github.com/DX-standarization-Team/common-service-v2".insteadOf "https://github.com/DX-standarization-Team/common-service-v2"
 # RUN git config --global url."https://x-access-token:${TOKEN}@github.com/".insteadOf "https://github.com/"
 
 # ACCESS TOKEN version
@@ -31,7 +31,7 @@ RUN git config --global url."https://x-access-token:${TOKEN}@github.com/DX-stand
 # SSH version
 # RUN git config --global url."ssh://git@github.com".insteadOf "https://github.com"
 
-RUN go mod download
+# RUN go mod download
 
 # Copy local code to the container image.
 COPY . ./
