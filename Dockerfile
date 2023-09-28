@@ -1,4 +1,3 @@
-# FROM golang:1.17-buster as builder
 FROM golang:1.18-buster as builder
  
 # Create and change to the app directory.
@@ -12,10 +11,9 @@ COPY go.* ./
 # Set Private repository access
 ARG TOKEN
 ENV GOPRIVATE=github.com/DX-standarization-Team/common-service-v2
-# ENV GONOSUMDB=github.com/DX-standarization-Team/common-service-v2
 
-RUN git config --global url."https://x-access-token:${TOKEN}@github.com/DX-standarization-Team/common-service-v2".insteadOf "https://github.com/DX-standarization-Team/common-service-v2"
-# RUN git config --global url."https://x-access-token:${TOKEN}@github.com/".insteadOf "https://github.com/"
+# RUN git config --global url."https://x-access-token:${TOKEN}@github.com/DX-standarization-Team/common-service-v2".insteadOf "https://github.com/DX-standarization-Team/common-service-v2"
+RUN git config --global url."https://x-access-token:${TOKEN}@github.com/".insteadOf "https://github.com/"
 # RUN echo "set GOPRIVATE, GONOPROXY, GONOSUMDB: ${GOPRIVATE}"
 
 RUN go mod download
