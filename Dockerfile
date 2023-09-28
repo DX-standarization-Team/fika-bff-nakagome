@@ -1,5 +1,5 @@
-FROM golang:1.17-buster as builder
-# FROM golang:1.19-buster as builder
+# FROM golang:1.17-buster as builder
+FROM golang:1.19-buster as builder
  
 # Create and change to the app directory.
 WORKDIR /app
@@ -14,6 +14,7 @@ ARG TOKEN
 ENV GOPRIVATE=github.com/DX-standarization-Team/common-service-v2
 ENV GONOPROXY=github.com/DX-standarization-Team/common-service-v2
 ENV GONOSUMDB=github.com/DX-standarization-Team/common-service-v2
+
 RUN git config --global url."https://x-access-token:${TOKEN}@github.com/DX-standarization-Team/common-service-v2".insteadOf "https://github.com/DX-standarization-Team/common-service-v2"
 RUN git config --global --list
 # RUN git config --global url."https://x-access-token:${TOKEN}@github.com/".insteadOf "https://github.com/"
@@ -32,10 +33,10 @@ RUN go build -x -v -o server
 # https://docs.docker.com/develop/develop-images/multistage-build/#use-multi-stage-builds
 FROM debian:buster-slim
 
-ENV GOPRIVATE=github.com/DX-standarization-Team/common-service-v2
-ENV GONOPROXY=github.com/DX-standarization-Team/common-service-v2
-ENV GONOSUMDB=github.com/DX-standarization-Team/common-service-v2
-RUN echo "set GOPRIVATE, GONOPROXY, GONOSUMDB: ${GOPRIVATE}"
+# ENV GOPRIVATE=github.com/DX-standarization-Team/common-service-v2
+# ENV GONOPROXY=github.com/DX-standarization-Team/common-service-v2
+# ENV GONOSUMDB=github.com/DX-standarization-Team/common-service-v2
+# RUN echo "set GOPRIVATE, GONOPROXY, GONOSUMDB: ${GOPRIVATE}"
 
 RUN set -x && apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y \
     ca-certificates && \
