@@ -15,16 +15,15 @@ ARG TOKEN
 ENV GOPRIVATE=github.com/DX-standarization-Team/common-service-v2
 ENV GONOPROXY=github.com/DX-standarization-Team/common-service-v2
 ENV GONOSUMDB=github.com/DX-standarization-Team/common-service-v2
-
-# RUN git config --global url."https://x-access-token:${TOKEN}@github.com/DX-standarization-Team/common-service-v2".insteadOf "https://github.com/DX-standarization-Team/common-service-v2"
-RUN git config --global url."https://x-access-token:${TOKEN}@github.com/".insteadOf "https://github.com/"
+RUN git config --global url."https://x-access-token:${TOKEN}@github.com/DX-standarization-Team/common-service-v2".insteadOf "https://github.com/DX-standarization-Team/common-service-v2"
+# RUN git config --global url."https://x-access-token:${TOKEN}@github.com/".insteadOf "https://github.com/"
 
 RUN go mod download
 
 # Copy local code to the container image.
 COPY . ./
  
-# Build the binary.
+# Build the binary.（-x: ログ詳細）
 RUN go build -x -v -o server
  
 # Use the official Debian slim image for a lean production container.
