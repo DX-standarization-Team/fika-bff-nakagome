@@ -10,34 +10,21 @@ COPY go.* ./
 
 # # Set Private repository access
 # # RUN echo "set GOPRIVATE, GONOPROXY, GONOSUMDB: github.com/DX-standarization-Team/common-service-v2"
-# ENV GOPRIVATE=github.com/DX-standarization-Team/common-service-v2
-# ENV GONOPROXY=github.com/DX-standarization-Team/common-service-v2
-# ENV GONOSUMDB=github.com/DX-standarization-Team/common-service-v2
-# # ENV GOSUMDB=off
-# # ENV GOPROXY=direct
-# RUN echo $GOPRIVATE
+ENV GOPRIVATE=github.com/DX-standarization-Team/common-service-v2
+ENV GONOPROXY=github.com/DX-standarization-Team/common-service-v2
+ENV GONOSUMDB=github.com/DX-standarization-Team/common-service-v2
 
-# ARG TOKEN
+ARG TOKEN
 # RUN git config --global url."https://x-access-token:${TOKEN}@github.com/DX-standarization-Team/common-service-v2".insteadOf "https://github.com/DX-standarization-Team/common-service-v2"
-# RUN git config --global url."https://x-access-token:${TOKEN}@github.com/".insteadOf "https://github.com/"
+RUN git config --global url."https://x-access-token:${TOKEN}@github.com/".insteadOf "https://github.com/"
 
-# ACCESS TOKEN version
-# ARG ACCESS_TOKEN_PRIVATE_REPO
-# ARG USER_NAME
-# RUN echo "git config set. USER_NAME: $USER_NAME"
-# RUN git config --global url."https://$USER_NAME:$ACCESS_TOKEN_PRIVATE_REPO:x-oauth-basic@github.com/DX-standarization-Team/common-service-v2/".insteadOf "https://github.com/DX-standarization-Team/common-service-v2/"
-# RUN git config --global url."https://$ACCESS_TOKEN_PRIVATE_REPO:x-oauth-basic@github.com/DX-standarization-Team/common-service-v2/".insteadOf "https://github.com/DX-standarization-Team/common-service-v2/"
-
-# SSH version
-# RUN git config --global url."ssh://git@github.com".insteadOf "https://github.com"
-
-# RUN go mod download
+RUN go mod download
 
 # Copy local code to the container image.
 COPY . ./
  
 # Build the binary.
-RUN go build -v -o server
+RUN go build -x -v -o server
  
 # Use the official Debian slim image for a lean production container.
 # https://hub.docker.com/_/debian

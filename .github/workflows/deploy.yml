@@ -53,19 +53,9 @@ jobs:
           app_id: ${{ secrets.GIT_HUB_APP_ID }}
           private_key: ${{ secrets.PRIVATE_KEY }}
 
-      - name: Install dependencies
-        env:
-          GOPRIVATE: github.com/DX-standarization-Team/common-service-v2
-          GONOPROXY: github.com/DX-standarization-Team/common-service-v2
-          GONOSUMDB: github.com/DX-standarization-Team/common-service-v2
-        run: |
-          git config --global url."https://x-access-token:${{ steps.generate_token.outputs.token }}@github.com/DX-standarization-Team/common-service-v2".insteadOf "https://github.com/DX-standarization-Team/common-service-v2"
-          go mod download
-
       # Docker イメージを作成
       - name: "Build a docker image"
-        run: docker build -t $IMAGE .
-        # run: docker build -t $IMAGE . --build-arg TOKEN=${{ steps.generate_token.outputs.token }}
+        run: docker build -t $IMAGE . --build-arg TOKEN=${{ steps.generate_token.outputs.token }}
         # run: docker build -t $IMAGE . --build-arg ACCESS_TOKEN_PRIVATE_REPO=${{ secrets.ACCESS_TOKEN_PRIVATE_REPO }}
         # run: docker build -t $IMAGE . --build-arg ACCESS_TOKEN_PRIVATE_REPO=$ACCESS_TOKEN_PRIVATE_REPO --build-arg USER_NAME=$USER_NAME
 
