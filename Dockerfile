@@ -1,4 +1,7 @@
-FROM golang:1.18-buster as builder
+# Use the offical golang image to create a binary.
+# This is based on Debian and sets the GOPATH to /go.
+# https://hub.docker.com/_/golang
+FROM golang:1.16-buster as builder
  
 # Create and change to the app directory.
 WORKDIR /app
@@ -9,7 +12,6 @@ WORKDIR /app
 COPY go.* ./
 
 # Set Private repository access
-
 ENV GOPRIVATE=github.com/DX-standarization-Team/common-service-v2
 
 ARG TOKEN
