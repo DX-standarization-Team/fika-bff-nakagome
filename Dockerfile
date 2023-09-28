@@ -34,8 +34,6 @@ FROM debian:buster-slim
 ENV GOPRIVATE=github.com/DX-standarization-Team/common-service-v2
 ENV GONOPROXY=github.com/DX-standarization-Team/common-service-v2
 ENV GONOSUMDB=github.com/DX-standarization-Team/common-service-v2
-RUN git config --global url."https://x-access-token:${TOKEN}@github.com/DX-standarization-Team/common-service-v2".insteadOf "https://github.com/DX-standarization-Team/common-service-v2"
-RUN git config --global --list
 RUN echo "set GOPRIVATE, GONOPROXY, GONOSUMDB: ${GOPRIVATE}"
 
 RUN set -x && apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y \
