@@ -12,6 +12,7 @@ env:
   SERVICE_NAME: fika-bff-nakagome
   PORT: 8080
   GCP_REGION: us-central1
+  # GOPRIVATE: ${{ secrets.GOPRIVATE }}
 
 jobs:
   deploy:
