@@ -15,7 +15,6 @@ COPY go.* ./
 ENV GOPRIVATE=github.com/DX-standarization-Team/common-service-v2
 
 ARG TOKEN
-RUN --mount=type=secret,id=token TOKEN=$(cat /run/secrets/token)
 RUN git config --global url."https://x-access-token:${TOKEN}@github.com/".insteadOf "https://github.com/"
 
 # RUN echo "set GOPRIVATE, GONOPROXY, GONOSUMDB: ${GOPRIVATE}"
