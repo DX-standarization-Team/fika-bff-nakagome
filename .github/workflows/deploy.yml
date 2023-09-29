@@ -47,7 +47,8 @@ jobs:
 
       # Docker イメージを作成
       - name: "Build a docker image"
-        run: docker build -t $IMAGE . --build-arg TOKEN=${{ steps.generate_token.outputs.token }}
+        # run: docker build -t $IMAGE . --build-arg TOKEN=${{ steps.generate_token.outputs.token }}
+        run: docker build -t $IMAGE . --secret id=token,env=${{ steps.generate_token.outputs.token }}
 
       # Docker イメージを Container Registry に Push
       - name: "Push the docker image to Container Registry"
