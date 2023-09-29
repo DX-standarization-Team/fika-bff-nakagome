@@ -12,7 +12,7 @@ env:
   SERVICE_NAME: fika-bff-nakagome
   PORT: 8080
   GCP_REGION: us-central1
-  # GOPRIVATE: ${{ secrets.GOPRIVATE }}
+  GIT_HUB_ACCOUNT: ${{ secrets.GIT_HUB_ACCOUNT }}
 
 jobs:
   deploy:
@@ -47,7 +47,7 @@ jobs:
 
       # Docker イメージを作成
       - name: "Build a docker image"
-        run: docker build -t $IMAGE . --build-arg TOKEN=${{ steps.generate_token.outputs.token }}
+        run: docker build -t $IMAGE . --build-arg GIT_HUB_ACCOUNT= ${{ secrets.GIT_HUB_ACCOUNT }} TOKEN=${{ steps.generate_token.outputs.token }}
 
       # Docker イメージを Container Registry に Push
       - name: "Push the docker image to Container Registry"

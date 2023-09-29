@@ -12,10 +12,11 @@ WORKDIR /app
 COPY go.* ./
 
 # Set Private repository access
-ENV GOPRIVATE=github.com/DX-standarization-Team/common-service-v2
+ARG GIT_HUB_ACCOUNT
+ENV GOPRIVATE=github.com/${GIT_HUB_ACCOUNT}/*
 
 ARG TOKEN
-RUN git config --global url."https://x-access-token:${TOKEN}@github.com/".insteadOf "https://github.com/"
+RUN git config --global url."https://x-access-token:${TOKEN}@github.com/${GIT_HUB_ACCOUNT}/".insteadOf "https://github.com/${GIT_HUB_ACCOUNT}/"
 
 # RUN echo "set GOPRIVATE, GONOPROXY, GONOSUMDB: ${GOPRIVATE}"
 
