@@ -13,13 +13,16 @@ env:
   PORT: 8080
   GCP_REGION: us-central1
   GIT_HUB_ACCOUNT: ${{ secrets.GIT_HUB_ACCOUNT }}
-  RUNNING_ENV: prod
+  RUNNING_ENV: develop
 
 jobs:
   deploy:
     # if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
     steps:
+      - run: echo "${GITHUB_REF#refs/heads/}" # PRの番号が取得されてしまいます
+      - run: echo "${GITHUB_HEAD_REF}"
+      - run: echo "${{ github.ref }}"
       # リポジトリをチェックアウト
       - name: "Checkout the repository"
         uses: actions/checkout@v2
