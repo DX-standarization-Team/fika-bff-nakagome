@@ -42,7 +42,7 @@ COPY --from=builder /app/server /app/server
  
 # Run the web service on container startup.
 ARG RUNNING_ENV
+RUN echo $RUNNING_ENV
 # CMD ["/app/server", "-runningEnv=dev1234"]
-CMD ["sh", "-c", "/app/server -runningEnv=$RUNNING_ENV"]
-# CMD ["/app/server", "-runningEnv=$RUNNING_ENV"]
+CMD ["/app/server","-runningEnv=$RUNNING_ENV"]
 # CMD ["/app/server"]
