@@ -8,10 +8,12 @@ import (
 	"github.com/GoogleCloudPlatform/golang-samples/run/helloworld/router"
 )
 
-func main() {
+var runningEnv string
 
-	var runningEnv string
+func init() {
 	flag.StringVar(&runningEnv, "runningEnv", "dev", "Environment to use")
+}
+func main() {
 	flag.Parse()
 	log.Printf("RUNNING runningEnv: %s", runningEnv)
 
