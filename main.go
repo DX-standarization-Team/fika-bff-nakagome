@@ -41,7 +41,7 @@ func main() {
 	if err := decoder.Decode(&config); err != nil {
 		log.Fatalf("Failed to decode yaml. err: %v", err)
 	}
-	fmt.Printf("Application setting file password: %s", config.Credentials.Password)
+	log.Printf("Application setting file password: %s", config.Credentials.Password)
 
 	rtr := router.New()
 	if err := http.ListenAndServe("0.0.0.0:8080", rtr); err != nil {
