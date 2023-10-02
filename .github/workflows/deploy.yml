@@ -53,6 +53,7 @@ jobs:
           -t $IMAGE \
           --build-arg GIT_HUB_ACCOUNT=${{ secrets.GIT_HUB_ACCOUNT }} \
           --build-arg TOKEN=${{ steps.generate_token.outputs.token }} \
+          --build-arg RUNNING_ENV=$RUNNING_ENV \
           .
       # Docker イメージを Container Registry に Push
       - name: "Push the docker image to Container Registry"

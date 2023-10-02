@@ -1,7 +1,7 @@
 package main
 
 import (
-	// "flag"
+	"flag"
 	"log"
 	"net/http"
 
@@ -10,10 +10,10 @@ import (
 
 func main() {
 
-	// var env string
-	// flag.StringVar(&env, "env", "dev", "環境")
-	// flag.Parse()
-	// log.Printf("RUNNING env: %s", env)
+	var runningEnv string
+	flag.StringVar(&runningEnv, "runningEnv", "dev", "Environment to use")
+	flag.Parse()
+	log.Printf("RUNNING runningEnv: %s", runningEnv)
 
 	rtr := router.New()
 	if err := http.ListenAndServe("0.0.0.0:8080", rtr); err != nil {
