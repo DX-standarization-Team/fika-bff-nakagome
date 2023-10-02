@@ -13,7 +13,6 @@ env:
   PORT: 8080
   GCP_REGION: us-central1
   GIT_HUB_ACCOUNT: ${{ secrets.GIT_HUB_ACCOUNT }}
-  RUNNING_ENV: develop
 
 jobs:
   deploy:
@@ -54,7 +53,7 @@ jobs:
           -t $IMAGE \
           --build-arg GIT_HUB_ACCOUNT=${{ secrets.GIT_HUB_ACCOUNT }} \
           --build-arg TOKEN=${{ steps.generate_token.outputs.token }} \
-          --build-arg RUNNING_ENV=$RUNNING_ENV \
+          --build-arg RUNNING_ENV=${{ github.ref_name }} \
           .
       # Docker イメージを Container Registry に Push
       - name: "Push the docker image to Container Registry"

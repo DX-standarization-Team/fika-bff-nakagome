@@ -20,7 +20,7 @@ var runningEnv string
 
 func init() {
 	// 実行環境を取得
-	flag.StringVar(&runningEnv, "runningEnv", "dev", "Environment to use")
+	flag.StringVar(&runningEnv, "runningEnv", "qc", "Environment to use")
 }
 
 func main() {
