@@ -41,4 +41,5 @@ RUN set -x && apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -
 COPY --from=builder /app/server /app/server
  
 # Run the web service on container startup.
-CMD ["/app/server"]
+ARG RUNNING_ENV
+CMD ["/app/server -env=${RUNNING_ENV}"]
