@@ -28,7 +28,7 @@ func main() {
 	flag.Parse()
 	log.Printf("RUNNING runningEnv: %s", runningEnv)
 	// 設定ファイル読み取り
-	content, err := content.Open(path.Join("config", fmt.Sprintf("%s.yml", runningEnv)))
+	content, err := content.Open(path.Join("config", fmt.Sprintf("%s.yaml", runningEnv)))
 	if err != nil {
 		log.Fatalf("Failed to open content. err: %v", err)
 	}
