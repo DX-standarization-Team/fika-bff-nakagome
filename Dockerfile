@@ -45,4 +45,4 @@ ARG RUNNING_ENV
 ARG PARAM="-runningEnv=${RUNNING_ENV}"
 RUN echo $PARAM
 # CMD ["/app/server"]
-CMD ["/app/server", PARAM]
+CMD ["/app/server", $PARAM]
