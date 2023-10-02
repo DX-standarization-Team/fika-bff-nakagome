@@ -20,9 +20,7 @@ jobs:
     # if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
     steps:
-      - run: echo "${GITHUB_REF#refs/heads/}" # PRの番号が取得されてしまいます
-      - run: echo "${GITHUB_HEAD_REF}"
-      - run: echo "${{ github.ref }}"
+      - run: echo "${{ github.ref_name }}"
       # リポジトリをチェックアウト
       - name: "Checkout the repository"
         uses: actions/checkout@v2
