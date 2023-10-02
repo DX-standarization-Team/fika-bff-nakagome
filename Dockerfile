@@ -44,7 +44,6 @@ COPY --from=builder /app/server /app/server
 ARG RUNNING_ENV
 ENV RUNNING_ENV2=$RUNNING_ENV
 RUN echo $RUNNING_ENV2
-# CMD ["/app/server", "-runningEnv=dev1234"]
 # CMD ["/app/server","-runningEnv=$RUNNING_ENV2"]
 CMD ["sh", "-c", "/app/server -runningEnv=$RUNNING_ENV2"]
 # CMD ["/app/server"]

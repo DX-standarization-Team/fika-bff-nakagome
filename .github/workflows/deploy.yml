@@ -13,7 +13,7 @@ env:
   PORT: 8080
   GCP_REGION: us-central1
   GIT_HUB_ACCOUNT: ${{ secrets.GIT_HUB_ACCOUNT }}
-  RUNNING_ENV: dev123
+  RUNNING_ENV: prod
 
 jobs:
   deploy:
