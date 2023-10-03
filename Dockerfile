@@ -26,10 +26,9 @@ RUN go mod download
 COPY . ./
  
 # Build the binary.（-x: 詳細ログ出力）
-
 ARG RUNNING_ENV
 ENV RUNNING_ENV2=$RUNNING_ENV
-RUN go build -v -o server -runningEnv=$RUNNING_ENV2
+RUN go build -v -o server -ldflags "-X main.runningEnv=$RUNNING_ENV2"
  
 # Use the official Debian slim image for a lean production container.
 # https://hub.docker.com/_/debian
