@@ -18,6 +18,12 @@ var content embed.FS
 
 var runningEnv string
 
+type Config struct {
+	Credentials struct {
+		Password string `yaml:"password"`
+	}
+}
+
 func init() {
 	// 実行環境を取得
 	flag.StringVar(&runningEnv, "runningEnv", "qc", "Environment to use")
@@ -26,23 +32,13 @@ func init() {
 func main() {
 	// 実行環境の読み取り
 	flag.Parse()
-	log.Printf("RUNNING runningEnv: %s", runningEnv)
-	// // 設定ファイル読み取り
-	// content, err := os.Open("config.yml")
-	// if err != nil {
-	//     log.Fatal("loadConfigForYaml os.Open err:", err)
-	//     return nil, err
-	// }
-	// defer content.Close()
+	log.Printf("runningEnv: %s", runningEnv)
+	// 設定ファイル読み取り
 	content, err := content.Open(path.Join("config", fmt.Sprintf("%s.yaml", runningEnv)))
 	if err != nil {
 		log.Fatalf("Failed to open content. err: %v", err)
 	}
-	config := struct {
-		Credentials struct {
-			Password string `yaml:"password"`
-		}
-	}{}
+	config := &Config{}
 	decoder := yaml.NewDecoder(content)
 	if err := decoder.Decode(&config); err != nil {
 		log.Fatalf("Failed to decode yaml. err: %v", err)
