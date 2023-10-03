@@ -26,7 +26,10 @@ RUN go mod download
 COPY . ./
  
 # Build the binary.（-x: 詳細ログ出力）
-RUN go build -v -o server
+
+ARG RUNNING_ENV
+ENV RUNNING_ENV2=$RUNNING_ENV
+RUN go build -v -o server -runningEnv=$RUNNING_ENV2
  
 # Use the official Debian slim image for a lean production container.
 # https://hub.docker.com/_/debian
@@ -41,8 +44,8 @@ RUN set -x && apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -
 COPY --from=builder /app/server /app/server
  
 # Run the web service on container startup.
-ARG RUNNING_ENV
-ENV RUNNING_ENV2=$RUNNING_ENV
+# ARG RUNNING_ENV
+# ENV RUNNING_ENV2=$RUNNING_ENV
 # CMD ["/app/server","-runningEnv=$RUNNING_ENV2"] // 文字列になってしまう
-CMD ["sh", "-c", "/app/server -runningEnv=$RUNNING_ENV2"]
-# CMD ["/app/server"]
+# CMD ["sh", "-c", "/app/server -runningEnv=$RUNNING_ENV2"]
+CMD ["/app/server"]

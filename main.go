@@ -27,7 +27,13 @@ func main() {
 	// 実行環境の読み取り
 	flag.Parse()
 	log.Printf("RUNNING runningEnv: %s", runningEnv)
-	// 設定ファイル読み取り
+	// // 設定ファイル読み取り
+	// content, err := os.Open("config.yml")
+	// if err != nil {
+	//     log.Fatal("loadConfigForYaml os.Open err:", err)
+	//     return nil, err
+	// }
+	// defer content.Close()
 	content, err := content.Open(path.Join("config", fmt.Sprintf("%s.yaml", runningEnv)))
 	if err != nil {
 		log.Fatalf("Failed to open content. err: %v", err)

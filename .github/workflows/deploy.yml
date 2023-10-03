@@ -19,7 +19,6 @@ jobs:
     # if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
     steps:
-      - run: echo "${{ github.ref_name }}"
       # リポジトリをチェックアウト
       - name: "Checkout the repository"
         uses: actions/checkout@v2
