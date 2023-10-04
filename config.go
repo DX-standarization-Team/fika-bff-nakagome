@@ -30,9 +30,11 @@ func (c *Config) GetConfig() *Config {
 
 	// 実行環境を取得
 	flag.StringVar(&RunningEnv, "runningEnv", "develop", "Environment to use")
+
 	// 実行環境の読み取り
 	flag.Parse()
 	log.Printf("runningEnv: %s", RunningEnv)
+
 	// 設定ファイル読み取り
 	content, err := content.Open(path.Join("config", fmt.Sprintf("%s.yaml", RunningEnv)))
 	if err != nil {
