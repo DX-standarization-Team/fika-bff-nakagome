@@ -13,6 +13,8 @@ env:
   PORT: 8080
   GCP_REGION: us-central1
   GIT_HUB_ACCOUNT: ${{ secrets.GIT_HUB_ACCOUNT }}
+  AUTH0_DOMAIN: dev-kjqwuq76z8suldgw.us.auth0.com
+  AUTH0_AUDIENCE: https://fs-apigw-bff-nakagome-bi5axj14.uc.gateway.dev/
 
 jobs:
   deploy:
@@ -65,6 +67,7 @@ jobs:
             --image $IMAGE \
             --port $PORT \
             --project $GCP_PROJECT_ID \
+            --update-env-vars AUTH0_DOMAIN=$AUTH0_DOMAIN, $AUTH0_AUDIENCE=AUTH0_AUDIENCE \
             --region $GCP_REGION \
             --platform=managed \
             --allow-unauthenticated \
