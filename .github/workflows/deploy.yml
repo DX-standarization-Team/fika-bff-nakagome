@@ -67,7 +67,7 @@ jobs:
             --image $IMAGE \
             --port $PORT \
             --project $GCP_PROJECT_ID \
-            --update-env-vars AUTH0_DOMAIN=$AUTH0_DOMAIN, $AUTH0_AUDIENCE=AUTH0_AUDIENCE \
+            --update-env-vars AUTH0_DOMAIN=$AUTH0_DOMAIN, AUTH0_AUDIENCE=$AUTH0_AUDIENCE \
             --region $GCP_REGION \
             --platform=managed \
             --allow-unauthenticated \
