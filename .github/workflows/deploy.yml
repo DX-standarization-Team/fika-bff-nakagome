@@ -13,7 +13,7 @@ env:
   PORT: 8080
   GCP_REGION: us-central1
   GIT_HUB_ACCOUNT: ${{ secrets.GIT_HUB_ACCOUNT }}
-  AUTH0_DOMAIN: dev-kjqwuq76z8suldgw.us.auth0.com
+  AUTH0_DOMAIN: dev-t7kxxd60o2thjkzs.us.auth0.com
   AUTH0_AUDIENCE: https://fs-apigw-bff-nakagome-bi5axj14.uc.gateway.dev/
 
 jobs:
