@@ -49,9 +49,7 @@ func workflowHandler(w http.ResponseWriter, r *http.Request) {
 
 // BFF → api2 呼び出し
 func api2Handler(w http.ResponseWriter, r *http.Request) {
-
 	log.Printf("api2Handler was called")
-
 	orgId := authorization.GetOrgId(r)
 	log.Printf("orgId: %s", orgId)
 	config := main.GetConfig()
