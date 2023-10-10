@@ -44,10 +44,5 @@ func GetConfig() *Config {
 	if err := yaml.Unmarshal(b, &config); err != nil {
 		log.Fatalf("Failed to unmarshal content. err: %v", err)
 	}
-	// content, err := content.Open(path.Join("config", fmt.Sprintf("%s.yaml", RunningEnv)))
-	// decoder := yaml.NewDecoder(content)
-	// if err := decoder.Decode(&config); err != nil {
-	// 	log.Fatalf("Failed to decode yaml. err: %v", err)
-	// }
 	return config
 }
