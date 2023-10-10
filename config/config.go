@@ -17,7 +17,6 @@ var RunningEnv string
 
 type Config struct {
 	Credentials struct {
-		// Password string `yaml:"password"`
 		PORT string `yaml:"port"`
 	}
 	Auth0 struct {
@@ -37,7 +36,6 @@ func GetConfig() *Config {
 
 	// 設定ファイル読み取り
 	b, err := content.ReadFile(fmt.Sprintf("%s.yaml", RunningEnv))
-	fmt.Printf("config file bytes: %s\n", string(b))
 	if err != nil {
 		log.Fatalf("Failed to open content. err: %v", err)
 	}
@@ -50,7 +48,5 @@ func GetConfig() *Config {
 	// if err := decoder.Decode(&config); err != nil {
 	// 	log.Fatalf("Failed to decode yaml. err: %v", err)
 	// }
-	log.Printf("config: %v\n", config)
-
 	return config
 }

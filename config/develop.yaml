@@ -1,5 +1,4 @@
 credentials:
-  # password: dev123
   PORT: "8080"
 auth0:
   AUTH0_DOMAIN: "dev-kjqwuq76z8suldgw.us.auth0.com"
