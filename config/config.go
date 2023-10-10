@@ -1,4 +1,4 @@
-package main
+package config
 
 import (
 	"embed"
@@ -10,7 +10,7 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
-//go:embed config/*.yaml
+//go:embed *.yaml
 var content embed.FS
 
 var RunningEnv string
@@ -26,7 +26,7 @@ type Config struct {
 	}
 }
 
-func (c *Config) GetConfig() *Config {
+func GetConfig() *Config {
 
 	// 実行環境を取得
 	flag.StringVar(&RunningEnv, "runningEnv", "develop", "Environment to use")

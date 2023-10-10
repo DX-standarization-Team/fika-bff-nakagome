@@ -11,7 +11,7 @@ import (
 	executionspb "cloud.google.com/go/workflows/executions/apiv1/executionspb"
 
 	authorization "github.com/DX-standarization-Team/common-service-v2/middleware/authorization"
-	"github.com/GoogleCloudPlatform/golang-samples/run/helloworld/main"
+	"github.com/GoogleCloudPlatform/golang-samples/run/helloworld/config"
 	"google.golang.org/api/idtoken"
 )
 
@@ -52,8 +52,8 @@ func api2Handler(w http.ResponseWriter, r *http.Request) {
 	log.Printf("api2Handler was called")
 	orgId := authorization.GetOrgId(r)
 	log.Printf("orgId: %s", orgId)
-	config := main.GetConfig()
-	auth0aud := config.auth0.AUTH0_AUDIENCE
+	config := config.GetConfig()
+	auth0aud := config.Auth0.AUTH0_AUDIENCE
 	log.Printf("auth0aud: %s", auth0aud)
 
 	// context に含まれる jwt から org_id を抽出テスト
