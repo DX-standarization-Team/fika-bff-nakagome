@@ -37,18 +37,20 @@ func GetConfig() *Config {
 
 	// 設定ファイル読み取り
 	b, err := content.ReadFile(fmt.Sprintf("%s.yaml", RunningEnv))
+	fmt.Printf("config file bytes: %s\n", string(b))
 	if err != nil {
 		log.Fatalf("Failed to open content. err: %v", err)
 	}
 	config := &Config{}
 	if err := yaml.Unmarshal(b, &config); err != nil {
-		log.Fatal("Failed to unmarshal content. err: %v", err)
+		log.Fatalf("Failed to unmarshal content. err: %v", err)
 	}
 	// content, err := content.Open(path.Join("config", fmt.Sprintf("%s.yaml", RunningEnv)))
 	// decoder := yaml.NewDecoder(content)
 	// if err := decoder.Decode(&config); err != nil {
 	// 	log.Fatalf("Failed to decode yaml. err: %v", err)
 	// }
+	log.Printf("config: %v\n", config)
 
 	return config
 }
