@@ -5,7 +5,6 @@ import (
 	"flag"
 	"fmt"
 	"log"
-	"path"
 
 	"gopkg.in/yaml.v3"
 )
@@ -36,7 +35,8 @@ func GetConfig() *Config {
 	log.Printf("runningEnv: %s", RunningEnv)
 
 	// 設定ファイル読み取り
-	content, err := content.Open(path.Join("config", fmt.Sprintf("%s.yaml", RunningEnv)))
+	content, err := content.Open(fmt.Sprintf("%s.yaml", RunningEnv))
+	// content, err := content.Open(path.Join("config", fmt.Sprintf("%s.yaml", RunningEnv)))
 	if err != nil {
 		log.Fatalf("Failed to open content. err: %v", err)
 	}
