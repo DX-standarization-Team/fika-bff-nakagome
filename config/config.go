@@ -13,6 +13,7 @@ import (
 //go:embed *.yaml
 var content embed.FS
 
+// flag変数宣言
 var RunningEnv string
 
 type Config struct {
@@ -20,19 +21,20 @@ type Config struct {
 		PORT string `yaml:"port"`
 	}
 	Auth0 struct {
-		AUTH0_DOMAIN   string `yaml:"auth0Domain"`
-		AUTH0_AUDIENCE string `yaml:"auth0Audience"`
+		AUTH0_DOMAIN   string `yaml:"AUTH0_DOMAIN"`
+		AUTH0_AUDIENCE string `yaml:"AUTH0_AUDIENCE"`
 	}
 }
 
-func GetConfig() *Config {
-
+func init() {
 	// 実行環境を取得
-	flag.StringVar(&RunningEnv, "runningEnv", "develop", "Environment to use")
+	flag.StringVar(&RunningEnv, "RunningEnv", "development", "Environment to use")
+}
 
+func GetConfig() *Config {
 	// 実行環境の読み取り
 	flag.Parse()
-	log.Printf("runningEnv: %s", RunningEnv)
+	log.Printf("RunningEnv: %s", RunningEnv)
 
 	// 設定ファイル読み取り
 	b, err := content.ReadFile(fmt.Sprintf("%s.yaml", RunningEnv))

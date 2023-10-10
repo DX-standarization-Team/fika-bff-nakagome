@@ -1,5 +1,5 @@
 credentials:
-  PORT: "8080"
+  port: "8080"
 auth0:
   AUTH0_DOMAIN: "dev-kjqwuq76z8suldgw.us.auth0.com"
   AUTH0_AUDIENCE: "https://fs-apigw-bff-nakagome-bi5axj14.uc.gateway.dev/"
