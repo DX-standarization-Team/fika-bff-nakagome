@@ -52,6 +52,7 @@ func api2Handler(w http.ResponseWriter, r *http.Request) {
 	log.Printf("api2Handler was called")
 	orgId := authorization.GetOrgId(r)
 	log.Printf("orgId: %s", orgId)
+	log.Println("calling GetConfig")
 	config := config.GetConfig()
 	auth0aud := config.Auth0.AUTH0_AUDIENCE
 	log.Printf("auth0aud: %s", auth0aud)
