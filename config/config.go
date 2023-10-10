@@ -6,7 +6,8 @@ import (
 	"fmt"
 	"log"
 
-	"gopkg.in/yaml.v3"
+	"encoding/json"
+	// "gopkg.in/yaml.v3"
 )
 
 //go:embed *.yaml
@@ -35,16 +36,20 @@ func GetConfig() *Config {
 	log.Printf("runningEnv: %s", RunningEnv)
 
 	// 設定ファイル読み取り
-	content, err := content.Open(fmt.Sprintf("%s.yaml", RunningEnv))
+	bytes, err := content.ReadFile(fmt.Sprintf("%s.yaml", RunningEnv))
 	// content, err := content.Open(path.Join("config", fmt.Sprintf("%s.yaml", RunningEnv)))
 	if err != nil {
 		log.Fatalf("Failed to open content. err: %v", err)
 	}
 	config := &Config{}
-	decoder := yaml.NewDecoder(content)
-	if err := decoder.Decode(&config); err != nil {
-		log.Fatalf("Failed to decode yaml. err: %v", err)
+	if err := json.Unmarshal(bytes, &config); err != nil {
+		log.Fatal(err)
 	}
+	// config := &Config{}
+	// decoder := yaml.NewDecoder(content)
+	// if err := decoder.Decode(&config); err != nil {
+	// 	log.Fatalf("Failed to decode yaml. err: %v", err)
+	// }
 	log.Printf("Application setting file password: %v", config.Credentials)
 
 	return config
