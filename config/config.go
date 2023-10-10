@@ -6,15 +6,11 @@ import (
 	"fmt"
 	"log"
 
-	// "encoding/json"
 	"gopkg.in/yaml.v3"
 )
 
 //go:embed *.yaml
 var content embed.FS
-
-// flag変数宣言
-var RunningEnv string
 
 type Config struct {
 	Credentials struct {
@@ -26,9 +22,12 @@ type Config struct {
 	}
 }
 
+// flag変数宣言
+var RunningEnv string
+
 func init() {
 	// 実行環境を取得
-	flag.StringVar(&RunningEnv, "RunningEnv", "development", "Environment to use")
+	flag.StringVar(&RunningEnv, "runningEnv", "dev", "Environment to use")
 }
 
 func GetConfig() *Config {
