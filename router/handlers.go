@@ -17,6 +17,7 @@ import (
 
 // BFF → workflow → api1 呼び出し
 func workflowHandler(w http.ResponseWriter, r *http.Request) {
+	log.Println("workflowHandler entering")
 	log.Printf("Authorization: %s", r.Header.Get("Authorization"))
 	log.Printf("X-Forwarded-Authorization: %s", r.Header.Get("X-Forwarded-Authorization"))
 	token := r.Header.Get("X-Forwarded-Authorization")
