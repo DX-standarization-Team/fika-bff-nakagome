@@ -1,0 +1,812 @@
+rules: []
+rulesConfigs: []
+hooks:
+  - name: test-nakagome
+    script: ./hooks/test-nakagome.js
+    dependencies: {}
+    enabled: false
+    secrets: {}
+    triggerId: credentials-exchange
+pages: []
+resourceServers:
+  - name: fs-apigwBff-nakagome
+    identifier: https://fs-apigw-bff-nakagome-bi5axj14.uc.gateway.dev/
+    allow_offline_access: false
+    signing_alg: RS256
+    skip_consent_for_verifiable_first_party_clients: true
+    token_lifetime: 86400
+    token_lifetime_for_web: 7200
+  - name: fs-gcpapigw-nakagome
+    identifier: https://fs-apigw-nakagome-bi5axj14.uc.gateway.dev/
+    allow_offline_access: false
+    signing_alg: RS256
+    skip_consent_for_verifiable_first_party_clients: true
+    token_lifetime: 86400
+    token_lifetime_for_web: 7200
+clients:
+  - name: API Explorer Application
+    allowed_clients: []
+    allowed_origins:
+      - https://localhost:3000/
+      - http://localhost:3000/
+    app_type: non_interactive
+    callbacks: []
+    client_aliases: []
+    cross_origin_auth: false
+    custom_login_page_on: true
+    grant_types:
+      - client_credentials
+    is_first_party: true
+    is_token_endpoint_ip_header_trusted: false
+    jwt_configuration:
+      alg: RS256
+      lifetime_in_seconds: 36000
+      secret_encoded: false
+    native_social_login:
+      apple:
+        enabled: false
+      facebook:
+        enabled: false
+    oidc_conformant: true
+    refresh_token:
+      expiration_type: non-expiring
+      leeway: 0
+      infinite_token_lifetime: true
+      infinite_idle_token_lifetime: true
+      token_lifetime: 31557600
+      idle_token_lifetime: 2592000
+      rotation_type: non-rotating
+    sso_disabled: false
+    token_endpoint_auth_method: client_secret_post
+  - name: Corp A M2M Application
+    allowed_clients: []
+    allowed_logout_urls:
+      - http://localhost:3000
+    allowed_origins: @@ALLOWED_ORIGINS@@
+    app_type: non_interactive
+    callbacks: @@APP_CALLBACKS@@
+    client_metadata:
+      org_id: org_PcFoaISu0F51dKJd
+    cross_origin_auth: false
+    custom_login_page_on: true
+    grant_types:
+      - client_credentials
+    is_first_party: true
+    is_token_endpoint_ip_header_trusted: false
+    jwt_configuration:
+      alg: RS256
+      lifetime_in_seconds: 36000
+      secret_encoded: false
+    oidc_conformant: false
+    refresh_token:
+      expiration_type: non-expiring
+      leeway: 0
+      infinite_token_lifetime: true
+      infinite_idle_token_lifetime: true
+      token_lifetime: 31557600
+      idle_token_lifetime: 2592000
+      rotation_type: non-rotating
+    sso_disabled: false
+    token_endpoint_auth_method: client_secret_post
+  - name: Default App
+    app_type: spa
+    callbacks: []
+    cross_origin_auth: false
+    custom_login_page_on: true
+    grant_types:
+      - authorization_code
+      - implicit
+      - refresh_token
+      - client_credentials
+    is_first_party: true
+    is_token_endpoint_ip_header_trusted: false
+    jwt_configuration:
+      alg: RS256
+      lifetime_in_seconds: 36000
+      secret_encoded: false
+    oidc_conformant: true
+    refresh_token:
+      expiration_type: non-expiring
+      leeway: 0
+      infinite_token_lifetime: true
+      infinite_idle_token_lifetime: true
+      token_lifetime: 2592000
+      idle_token_lifetime: 1296000
+      rotation_type: non-rotating
+    sso_disabled: false
+  - name: Deploy CLI
+    app_type: non_interactive
+    cross_origin_auth: false
+    custom_login_page_on: true
+    grant_types:
+      - client_credentials
+    is_first_party: true
+    is_token_endpoint_ip_header_trusted: false
+    jwt_configuration:
+      alg: RS256
+      lifetime_in_seconds: 36000
+      secret_encoded: false
+    oidc_conformant: true
+    refresh_token:
+      expiration_type: non-expiring
+      leeway: 0
+      infinite_token_lifetime: true
+      infinite_idle_token_lifetime: true
+      token_lifetime: 31557600
+      idle_token_lifetime: 2592000
+      rotation_type: non-rotating
+    sso_disabled: false
+    token_endpoint_auth_method: client_secret_post
+  - name: Flutter Application
+    allowed_clients: []
+    allowed_logout_urls:
+      - >-
+        "com.auth0.flutterdemo1://##DOMAIN##/ios/com.auth0.flutterdemo1/callback"
+    app_type: native
+    callbacks:
+      - >-
+        "com.auth0.flutterdemo1://##DOMAIN##/ios/com.auth0.flutterdemo1/callback"
+    client_aliases: []
+    cross_origin_auth: false
+    custom_login_page_on: true
+    grant_types:
+      - authorization_code
+      - implicit
+      - refresh_token
+    is_first_party: true
+    is_token_endpoint_ip_header_trusted: false
+    jwt_configuration:
+      alg: RS256
+      lifetime_in_seconds: 36000
+      secret_encoded: false
+    native_social_login:
+      apple:
+        enabled: false
+      facebook:
+        enabled: false
+    oidc_conformant: true
+    refresh_token:
+      expiration_type: non-expiring
+      leeway: 0
+      infinite_token_lifetime: true
+      infinite_idle_token_lifetime: true
+      token_lifetime: 2592000
+      idle_token_lifetime: 1296000
+      rotation_type: non-rotating
+    sso_disabled: false
+    token_endpoint_auth_method: none
+  - name: My App Morikawa
+    allowed_clients: []
+    allowed_logout_urls:
+      - http://localhost:3000
+    app_type: spa
+    callbacks:
+      - http://localhost:3000
+      - http://localhost:3001/
+      - http://localhost:3000/api/auth/callback
+      - https://kaigofika-poc01.firebaseapp.com/__/auth/handler
+    client_aliases: []
+    cross_origin_auth: false
+    custom_login_page_on: true
+    grant_types:
+      - authorization_code
+      - implicit
+      - refresh_token
+    is_first_party: true
+    is_token_endpoint_ip_header_trusted: false
+    jwt_configuration:
+      alg: RS256
+      lifetime_in_seconds: 36000
+      secret_encoded: false
+    native_social_login:
+      apple:
+        enabled: false
+      facebook:
+        enabled: false
+    oidc_conformant: true
+    organization_require_behavior: no_prompt
+    organization_usage: allow
+    refresh_token:
+      expiration_type: expiring
+      leeway: 0
+      token_lifetime: 2592000
+      idle_token_lifetime: 1296000
+      infinite_token_lifetime: false
+      infinite_idle_token_lifetime: false
+      rotation_type: rotating
+    sso_disabled: false
+    token_endpoint_auth_method: none
+    web_origins:
+      - http://localhost:3000
+  - name: My AppNakagome
+    allowed_clients: []
+    allowed_logout_urls:
+      - https://localhost:3000/
+      - http://localhost:3000/
+    allowed_origins:
+      - https://localhost:3000/
+      - http://localhost:3000/
+    app_type: spa
+    callbacks:
+      - https://localhost:3000/
+      - http://localhost:3001/
+      - http://localhost:3000/
+      - http://localhost:3000/api/auth/callback
+      - https://kaigofika-poc01.firebaseapp.com/__/auth/handler
+    client_aliases: []
+    client_metadata:
+      org_id: org_jCMMHxNbM9CELjvp
+    cross_origin_auth: false
+    custom_login_page_on: true
+    grant_types:
+      - authorization_code
+      - implicit
+      - refresh_token
+    is_first_party: true
+    is_token_endpoint_ip_header_trusted: false
+    jwt_configuration:
+      alg: RS256
+      lifetime_in_seconds: 36000
+      secret_encoded: false
+    native_social_login:
+      apple:
+        enabled: false
+      facebook:
+        enabled: false
+    oidc_conformant: true
+    organization_require_behavior: no_prompt
+    organization_usage: allow
+    refresh_token:
+      expiration_type: expiring
+      leeway: 0
+      token_lifetime: 2592000
+      idle_token_lifetime: 1296000
+      infinite_token_lifetime: false
+      infinite_idle_token_lifetime: false
+      rotation_type: rotating
+    sso_disabled: false
+    token_endpoint_auth_method: none
+    web_origins:
+      - https://localhost:3000/
+      - http://localhost:3000/
+  - name: MyNativeAppKimura
+    app_type: native
+    cross_origin_auth: false
+    custom_login_page_on: true
+    grant_types:
+      - authorization_code
+      - implicit
+      - refresh_token
+    is_first_party: true
+    is_token_endpoint_ip_header_trusted: false
+    jwt_configuration:
+      alg: RS256
+      lifetime_in_seconds: 36000
+      secret_encoded: false
+    oidc_conformant: true
+    refresh_token:
+      expiration_type: non-expiring
+      leeway: 0
+      infinite_token_lifetime: true
+      infinite_idle_token_lifetime: true
+      token_lifetime: 2592000
+      idle_token_lifetime: 1296000
+      rotation_type: non-rotating
+    sso_disabled: false
+    token_endpoint_auth_method: none
+  - name: MySpaAppKimura
+    allowed_clients: []
+    allowed_logout_urls:
+      - http://localhost:3000
+    allowed_origins: []
+    app_type: spa
+    callbacks:
+      - http://localhost:3000
+      - http://localhost:3001/
+      - https://localhost:3000
+      - https://localhost:3001/
+      - http://localhost:3000/api/auth/callback
+      - https://kaigofika-poc01.firebaseapp.com/__/auth/handler
+      - https://localhost:3000/api/auth/callback
+    client_aliases: []
+    cross_origin_auth: false
+    cross_origin_authentication: true
+    custom_login_page_on: true
+    grant_types:
+      - authorization_code
+      - implicit
+      - refresh_token
+    is_first_party: true
+    is_token_endpoint_ip_header_trusted: false
+    jwt_configuration:
+      alg: RS256
+      lifetime_in_seconds: 36000
+      secret_encoded: false
+    native_social_login:
+      apple:
+        enabled: false
+      facebook:
+        enabled: false
+    oidc_conformant: true
+    organization_require_behavior: no_prompt
+    organization_usage: allow
+    refresh_token:
+      expiration_type: expiring
+      leeway: 0
+      token_lifetime: 2592000
+      idle_token_lifetime: 1296000
+      infinite_token_lifetime: false
+      infinite_idle_token_lifetime: false
+      rotation_type: rotating
+    sso_disabled: false
+    token_endpoint_auth_method: none
+    web_origins:
+      - http://localhost:3000
+  - name: fs-apigwBff-nakagome (Test Application)
+    allowed_clients: []
+    allowed_logout_urls:
+      - http://localhost:3000
+    allowed_origins:
+      - http://localhost:3000
+    app_type: non_interactive
+    callbacks:
+      - http://localhost:3000
+    client_aliases: []
+    client_metadata:
+      org_id: org_jCMMHxNbM9CELjvp
+    cross_origin_auth: false
+    custom_login_page_on: true
+    grant_types:
+      - client_credentials
+    is_first_party: true
+    is_token_endpoint_ip_header_trusted: false
+    jwt_configuration:
+      alg: RS256
+      lifetime_in_seconds: 36000
+      secret_encoded: false
+    native_social_login:
+      apple:
+        enabled: false
+      facebook:
+        enabled: false
+    oidc_conformant: true
+    refresh_token:
+      expiration_type: non-expiring
+      leeway: 0
+      infinite_token_lifetime: true
+      infinite_idle_token_lifetime: true
+      token_lifetime: 31557600
+      idle_token_lifetime: 2592000
+      rotation_type: non-rotating
+    sso_disabled: false
+    token_endpoint_auth_method: client_secret_post
+    web_origins:
+      - http://localhost:3000
+databases:
+  - name: Username-Password-Authentication
+    strategy: auth0
+    enabled_clients:
+      - API Explorer Application
+      - Corp A M2M Application
+      - Default App
+      - Deploy CLI
+      - Flutter Application
+      - fs-apigwBff-nakagome (Test Application)
+      - My App Morikawa
+      - My AppNakagome
+      - MyNativeAppKimura
+      - MySpaAppKimura
+    is_domain_connection: false
+    options:
+      mfa:
+        active: true
+        return_enroll_settings: true
+      passwordPolicy: good
+      strategy_version: 2
+      brute_force_protection: true
+    realms:
+      - Username-Password-Authentication
+connections:
+  - name: google-oauth2
+    strategy: google-oauth2
+    enabled_clients:
+      - API Explorer Application
+      - Corp A M2M Application
+      - Default App
+      - Deploy CLI
+      - Flutter Application
+      - fs-apigwBff-nakagome (Test Application)
+      - My App Morikawa
+      - MyNativeAppKimura
+      - MySpaAppKimura
+    is_domain_connection: false
+    options:
+      email: true
+      scope:
+        - email
+        - profile
+      profile: true
+  - name: line
+    strategy: line
+    enabled_clients:
+      - API Explorer Application
+      - Corp A M2M Application
+      - Flutter Application
+      - fs-apigwBff-nakagome (Test Application)
+      - My App Morikawa
+      - My AppNakagome
+      - MyNativeAppKimura
+      - MySpaAppKimura
+    is_domain_connection: false
+    options:
+      email: false
+      scope:
+        - openid
+        - profile
+      profile: true
+      client_id: "2001088577"
+      client_secret: d8062926d182c79909ee9538b86e306d
+tenant:
+  enabled_locales:
+    - en
+    - ja
+  flags:
+    enable_dynamic_client_registration: false
+    revoke_refresh_token_grant: false
+    disable_clickjack_protection_headers: false
+  idle_session_lifetime: 72
+  sandbox_version: "18"
+  session_lifetime: 720
+  universal_login:
+    passwordless:
+      allow_magiclink_verify_without_session: true
+emailProvider: {}
+emailTemplates: []
+clientGrants:
+  - client_id: API Explorer Application
+    audience: "https://##DOMAIN##/api/v2/"
+    scope:
+      - read:client_grants
+      - create:client_grants
+      - delete:client_grants
+      - update:client_grants
+      - read:users
+      - update:users
+      - delete:users
+      - create:users
+      - read:users_app_metadata
+      - update:users_app_metadata
+      - delete:users_app_metadata
+      - create:users_app_metadata
+      - read:user_custom_blocks
+      - create:user_custom_blocks
+      - delete:user_custom_blocks
+      - create:user_tickets
+      - read:clients
+      - update:clients
+      - delete:clients
+      - create:clients
+      - read:client_keys
+      - update:client_keys
+      - delete:client_keys
+      - create:client_keys
+      - read:connections
+      - update:connections
+      - delete:connections
+      - create:connections
+      - read:resource_servers
+      - update:resource_servers
+      - delete:resource_servers
+      - create:resource_servers
+      - read:device_credentials
+      - update:device_credentials
+      - delete:device_credentials
+      - create:device_credentials
+      - read:rules
+      - update:rules
+      - delete:rules
+      - create:rules
+      - read:rules_configs
+      - update:rules_configs
+      - delete:rules_configs
+      - read:hooks
+      - update:hooks
+      - delete:hooks
+      - create:hooks
+      - read:actions
+      - update:actions
+      - delete:actions
+      - create:actions
+      - read:email_provider
+      - update:email_provider
+      - delete:email_provider
+      - create:email_provider
+      - blacklist:tokens
+      - read:stats
+      - read:insights
+      - read:tenant_settings
+      - update:tenant_settings
+      - read:logs
+      - read:logs_users
+      - read:shields
+      - create:shields
+      - update:shields
+      - delete:shields
+      - read:anomaly_blocks
+      - delete:anomaly_blocks
+      - update:triggers
+      - read:triggers
+      - read:grants
+      - delete:grants
+      - read:guardian_factors
+      - update:guardian_factors
+      - read:guardian_enrollments
+      - delete:guardian_enrollments
+      - create:guardian_enrollment_tickets
+      - read:user_idp_tokens
+      - create:passwords_checking_job
+      - delete:passwords_checking_job
+      - read:custom_domains
+      - delete:custom_domains
+      - create:custom_domains
+      - update:custom_domains
+      - read:email_templates
+      - create:email_templates
+      - update:email_templates
+      - read:mfa_policies
+      - update:mfa_policies
+      - read:roles
+      - create:roles
+      - delete:roles
+      - update:roles
+      - read:prompts
+      - update:prompts
+      - read:branding
+      - update:branding
+      - delete:branding
+      - read:log_streams
+      - create:log_streams
+      - delete:log_streams
+      - update:log_streams
+      - create:signing_keys
+      - read:signing_keys
+      - update:signing_keys
+      - read:limits
+      - update:limits
+      - create:role_members
+      - read:role_members
+      - delete:role_members
+      - read:entitlements
+      - read:attack_protection
+      - update:attack_protection
+      - read:organizations
+      - update:organizations
+      - create:organizations
+      - delete:organizations
+      - create:organization_members
+      - read:organization_members
+      - delete:organization_members
+      - create:organization_connections
+      - read:organization_connections
+      - update:organization_connections
+      - delete:organization_connections
+      - create:organization_member_roles
+      - read:organization_member_roles
+      - delete:organization_member_roles
+      - create:organization_invitations
+      - read:organization_invitations
+      - delete:organization_invitations
+      - read:organizations_summary
+      - create:actions_log_sessions
+      - create:authentication_methods
+      - read:authentication_methods
+      - update:authentication_methods
+      - delete:authentication_methods
+  - client_id: Corp A M2M Application
+    audience: https://fs-apigw-bff-nakagome-bi5axj14.uc.gateway.dev/
+    scope: []
+  - client_id: fs-apigwBff-nakagome (Test Application)
+    audience: "https://##DOMAIN##/api/v2/"
+    scope: []
+  - client_id: fs-apigwBff-nakagome (Test Application)
+    audience: https://fs-apigw-bff-nakagome-bi5axj14.uc.gateway.dev/
+    scope: []
+guardianFactors:
+  - name: duo
+    enabled: false
+  - name: email
+    enabled: false
+  - name: otp
+    enabled: true
+  - name: push-notification
+    enabled: false
+  - name: recovery-code
+    enabled: false
+  - name: sms
+    enabled: false
+  - name: webauthn-platform
+    enabled: false
+  - name: webauthn-roaming
+    enabled: false
+guardianFactorProviders: []
+guardianFactorTemplates: []
+guardianPolicies:
+  policies: []
+guardianPhoneFactorSelectedProvider:
+  provider: auth0
+guardianPhoneFactorMessageTypes:
+  message_types: []
+roles: []
+branding:
+  templates: []
+prompts:
+  customText: {}
+  universal_login_experience: new
+migrations: {}
+actions:
+  - name: AddingM2MOrgIDAction_kimura
+    code: ./actions/AddingM2MOrgIDAction_kimura/code.js
+    dependencies: []
+    deployed: false
+    runtime: node16
+    secrets: []
+    status: built
+    supported_triggers:
+      - id: credentials-exchange
+        version: v2
+  - name: AddingM2MOrgIdAction
+    code: ./actions/AddingM2MOrgIdAction/code.js
+    dependencies:
+      - name: auth0
+        version: 2.35.0
+    deployed: true
+    runtime: node16
+    secrets: []
+    status: built
+    supported_triggers:
+      - id: credentials-exchange
+        version: v2
+  - name: AddingM2MOrgIdAction_v4
+    code: ./actions/AddingM2MOrgIdAction_v4/code.js
+    dependencies:
+      - name: auth0
+        version: 2.35.0
+    deployed: true
+    runtime: node18-actions
+    secrets:
+      - name: domain
+    status: built
+    supported_triggers:
+      - id: credentials-exchange
+        version: v2
+triggers:
+  credentials-exchange:
+    - action_name: AddingM2MOrgIdAction_v4
+      display_name: AddingM2MOrgIdAction_v4
+organizations:
+  - name: corp_a
+    branding:
+      colors:
+        page_background: "#425fd1"
+        primary: "#ffffff"
+    connections: []
+    display_name: Corp A
+  - name: corp_b
+    branding:
+      colors:
+        page_background: "#b1dd5f"
+        primary: "#f29e0d"
+    connections:
+      - name: line
+        assign_membership_on_login: true
+      - name: google-oauth2
+        assign_membership_on_login: true
+      - name: Username-Password-Authentication
+        assign_membership_on_login: true
+    display_name: Corp B
+  - name: scsk_01
+    branding:
+      logo_url: https://www.scsk.jp/img/common/header/img-logo-01.svg
+      colors:
+        page_background: "#425fd1"
+        primary: "#ffffff"
+    connections:
+      - name: line
+        assign_membership_on_login: false
+      - name: Username-Password-Authentication
+        assign_membership_on_login: false
+    display_name: SCSK
+attackProtection:
+  breachedPasswordDetection:
+    enabled: false
+    shields: []
+    admin_notification_frequency: []
+    method: standard
+    stage:
+      pre-user-registration:
+        shields: []
+  bruteForceProtection:
+    enabled: true
+    shields:
+      - block
+      - user_notification
+    mode: count_per_identifier_and_ip
+    allowlist: []
+    max_attempts: 10
+  suspiciousIpThrottling:
+    enabled: true
+    shields:
+      - admin_notification
+      - block
+    allowlist: []
+    stage:
+      pre-login:
+        max_attempts: 100
+        rate: 864000
+      pre-user-registration:
+        max_attempts: 50
+        rate: 1200
+logStreams: []
+themes:
+  - borders:
+      button_border_weight: 1
+      buttons_style: rounded
+      button_border_radius: 3
+      input_border_weight: 1
+      inputs_style: rounded
+      input_border_radius: 3
+      widget_corner_radius: 5
+      widget_border_weight: 0
+      show_widget_shadow: true
+    colors:
+      primary_button: "#635dff"
+      primary_button_label: "#ffffff"
+      secondary_button_border: "#c9cace"
+      secondary_button_label: "#1e212a"
+      base_focus_color: "#635dff"
+      base_hover_color: "#000000"
+      links_focused_components: "#635dff"
+      header: "#1e212a"
+      body_text: "#1e212a"
+      widget_background: "#ffffff"
+      widget_border: "#c9cace"
+      input_labels_placeholders: "#65676e"
+      input_filled_text: "#000000"
+      input_border: "#c9cace"
+      input_background: "#ffffff"
+      icons: "#65676e"
+      error: "#d03c38"
+      success: "#13a688"
+    displayName: Unnamed Theme
+    fonts:
+      font_url: ""
+      reference_text_size: 16
+      title:
+        bold: false
+        size: 150
+      subtitle:
+        bold: false
+        size: 87.5
+      body_text:
+        bold: false
+        size: 87.5
+      buttons_text:
+        bold: false
+        size: 100
+      input_labels:
+        bold: false
+        size: 100
+      links:
+        bold: true
+        size: 87.5
+      links_style: normal
+    page_background:
+      page_layout: center
+      background_color: "#000000"
+      background_image_url: ""
+    widget:
+      logo_position: center
+      logo_url: ""
+      logo_height: 52
+      header_text_alignment: center
+      social_buttons_layout: bottom

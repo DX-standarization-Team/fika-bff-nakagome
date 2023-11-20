@@ -1,0 +1,12 @@
+{
+  "AUTH0_DOMAIN": "scsk-sample-staging.ja.auth0.com",
+  "AUTH0_CLIENT_ID": "PUGs6cTB419JGkZW6u547hMqUfXuqlDj",
+  "AUTH0_CLIENT_SECRET": "MERvDFQbv8l-O7yKgCLWJN8hOJws-ZfikT2RffeSH86yyMqTGH6GKsIkB4wb7k9f",
+  "AUTH0_ALLOW_DELETE": false,
+  "AUTH0_KEYWORD_REPLACE_MAPPINGS": {
+    "ENV": "dev",
+    "ALLOWED_ORIGINS": ["https://staging.fika.app"],
+    "APP_CALLBACKS": ["https://staging.fika.app"],
+    "API_IDENTIFIER": "https://fika-apigw.uc.gateway.dev/"
+  }
+}

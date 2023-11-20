@@ -1,0 +1,7 @@
+{
+  "AUTH0_DOMAIN": "scsk-sample-staging.us.auth0.com",
+  "AUTH0_CLIENT_ID": "xbnVrDlLWfzvAC0Mpnt7i1by2VdhGTTG",
+  "AUTH0_CLIENT_SECRET": "Mnxw2nsj2ndSz7ftPVP1ZrinrOLhuWAsM3wT6I1-LS5ESBe_WTixT5IwE5qG2Svb",
+  "AUTH0_ALLOW_DELETE": false,
+  "AUTH0_EXCLUDED": ["organizations"]
+}

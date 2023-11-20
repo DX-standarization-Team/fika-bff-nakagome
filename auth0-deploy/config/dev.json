@@ -1,0 +1,17 @@
+{
+  "AUTH0_DOMAIN": "scsk-sample-dev.ja.auth0.com",
+  "AUTH0_CLIENT_ID": "EJitZvEgRirbpEkZ7xijT7XLxChfaNFl",
+  "AUTH0_CLIENT_SECRET": "LzrdBHfrVUczG3uXoo_uYpFtouJa7oJbr6uQxWcmdLBG54ihFZXsj60x8g180lt1",
+  "AUTH0_ALLOW_DELETE": false,
+  "AUTH_EXCLUDED": ["organizations"],
+  "EXCLUDED_PROPS": {
+    "clients": ["client_secret"],
+    "connections": ["options.client_secret"]
+  },
+  "AUTH0_KEYWORD_REPLACE_MAPPINGS": {
+    "ENV": "dev",
+    "ALLOWED_ORIGINS": ["https://localhost:3000"],
+    "APP_CALLBACKS": ["https://localhost:3000"],
+    "API_IDENTIFIER": "https://dev-fika-apigw.uc.gateway.dev/"
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "AUTH0_DOMAIN": "scsk-test.us.auth0.com",
+  "AUTH0_CLIENT_ID": "ZtlON14xmh3rZ01ZR0eUsZOGZbIdrZUg",
+  "AUTH0_CLIENT_SECRET": "rkBnzTDfj7tqhxTMoJVPXSr4zm3lSoS76nBGlnjmc78y2oQx2Y07uxKNOdNo6IKc",
+  "AUTH0_ALLOW_DELETE": false,
+  "AUTH0_KEYWORD_REPLACE_MAPPINGS": {
+    "DOMAIN": "scsk-test.us.auth0.com",
+    "ALLOWED_ORIGINS": ["https://dev.fika.app"],
+    "APP_CALLBACKS": ["https://dev.fika.app"]
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "AUTH0_DOMAIN": "dev-kjqwuq76z8suldgw.us.auth0.com",
+  "AUTH0_CLIENT_ID": "TBUDzxGhfb5MNEGY3yDK83XOGH5l1WN7",
+  "AUTH0_CLIENT_SECRET": "GGL6L-cPX32L9ajHGYXxQCaLoVTjoObec6npCrGvAcy1SdR6CPqOVy09qozQ6h6e",
+  "AUTH0_ALLOW_DELETE": false,
+  "AUTH0_KEYWORD_REPLACE_MAPPINGS": {
+    "DOMAIN": "dev-kjqwuq76z8suldgw.us.auth0.com",
+    "ALLOWED_ORIGINS": ["http://localhost:3000"],
+    "APP_CALLBACKS": ["http://localhost:3000"],
+    "API_IDENTIFIER": "https://fs-apigw-bff-nakagome-bi5axj14.uc.gateway.dev/"
+  }
+}

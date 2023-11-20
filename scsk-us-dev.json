@@ -1,0 +1,7 @@
+{
+  "AUTH0_DOMAIN": "scsk-sample-dev.us.auth0.com",
+  "AUTH0_CLIENT_ID": "OIG8KDTG8g4Ify1KGkebqU4dW1yOLTsA",
+  "AUTH0_CLIENT_SECRET": "XKjTOk8bH5s-kccttCQIsyZ6xqWWd7hXOp5fjRsC5hoeTFzP7h5NfBSAsGXJuEgj",
+  "AUTH0_ALLOW_DELETE": false,
+  "AUTH0_EXCLUDED": ["organizations"]
+}
