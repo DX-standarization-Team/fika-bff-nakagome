@@ -4,7 +4,7 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/GoogleCloudPlatform/golang-samples/run/ld/router"
+	"github.com/GoogleCloudPlatform/golang-samples/run/helloworld/router"
 )
 
 func main() {
