@@ -10,7 +10,7 @@ import (
 	executions "cloud.google.com/go/workflows/executions/apiv1"
 	executionspb "cloud.google.com/go/workflows/executions/apiv1/executionspb"
 
-	authorization "github.com/DX-standarization-Team/common-service-v2/middleware/authorization"
+	// authorization "github.com/DX-standarization-Team/common-service-v2/middleware/authorization"
 	"github.com/GoogleCloudPlatform/golang-samples/run/helloworld/config"
 	"google.golang.org/api/idtoken"
 )
@@ -50,9 +50,9 @@ func workflowHandler(w http.ResponseWriter, r *http.Request) {
 
 // BFF → api2 呼び出し
 func api2Handler(w http.ResponseWriter, r *http.Request) {
-	log.Printf("api2Handler was called")
-	orgId := authorization.GetOrgId(r)
-	log.Printf("orgId: %s", orgId)
+	// log.Printf("api2Handler was called")
+	// orgId := authorization.GetOrgId(r)
+	// log.Printf("orgId: %s", orgId)
 	config := config.GetConfig()
 	auth0aud := config.Auth0.AUTH0_AUDIENCE
 	log.Printf("auth0aud: %s", auth0aud)
