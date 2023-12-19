@@ -28,7 +28,7 @@ func NewLogger() *logging.Logger {
 	// Selects the log to write to.
 	logger := client.Logger(logName)
 	log.Printf("logger: %v", logger)
-	defer logger.Flush()
+	// defer logger.Flush()
 
 	return logger
 }
