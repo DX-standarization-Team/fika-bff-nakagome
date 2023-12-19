@@ -6,6 +6,7 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"strings"
 
 	executions "cloud.google.com/go/workflows/executions/apiv1"
 	executionspb "cloud.google.com/go/workflows/executions/apiv1/executionspb"
@@ -34,14 +35,14 @@ func workflowHandler(w http.ResponseWriter, r *http.Request) {
 	projectID := "kaigofika-poc01"
 
 	var trace string
-	formatString := "projects/" + projectID + "/traces/%s"
 	// Use Sscanf to extract values
-	_, err := fmt.Sscanf(r.Header.Get("X-Cloud-Trace-Context"), formatString, &trace)
-	if err != nil {
-		fmt.Println("Error:", err)
-		return
+	cloudTraceContext := r.Header.Get("X-Cloud-Trace-Context")
+	parts := strings.Split(cloudTraceContext, "/")
+	log.Printf("parts: %v", parts)
+	if len(parts) >= 1 {
+		trace = parts[0]
 	}
-	// Print the extracted values
+
 	fmt.Println("Trace:", trace)
 
 	// ------------------- zap logger --------------------------
