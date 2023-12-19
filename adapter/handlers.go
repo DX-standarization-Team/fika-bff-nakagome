@@ -6,6 +6,7 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"strings"
 
 	executions "cloud.google.com/go/workflows/executions/apiv1"
 	executionspb "cloud.google.com/go/workflows/executions/apiv1/executionspb"
@@ -16,18 +17,63 @@ import (
 
 	"cloud.google.com/go/logging"
 	// logger "github.com/GoogleCloudPlatform/golang-samples/run/helloworld/lib"
+	// "go.opentelemetry.io/otel/sdk/trace"
+	"go.uber.org/zap"
+	"go.uber.org/zap/zapcore"
 )
+
+type Payload struct {
+	Data interface{}
+}
 
 // BFF → workflow → api1 呼び出し
 func workflowHandler(w http.ResponseWriter, r *http.Request) {
 
 	log.Println("workflowHandler entering")
-	// cloud logging
+
+	log.Printf("operationId: %v", r.Header["traceparent"])
+	projectID := "kaigofika-poc01"
+	var trace string
+	if projectID != "" {
+		traceHeader := r.Header.Get("X-Cloud-Trace-Context")
+		traceParts := strings.Split(traceHeader, "/")
+		if len(traceParts) > 0 && len(traceParts[0]) > 0 {
+			trace = fmt.Sprintf("projects/%s/traces/%s", projectID, traceParts[0])
+		}
+	}
+	log.Printf("TraceID: %v", trace)
+
+	// ------------------- zap logger --------------------------
+	conf := zap.Config{
+		Level: zap.NewAtomicLevel(),
+		// Development: false,
+		Encoding: "json",
+		EncoderConfig: zapcore.EncoderConfig{
+			TimeKey:        "timestamp",
+			LevelKey:       "severity",
+			NameKey:        "name",
+			CallerKey:      "caller",
+			MessageKey:     "message",
+			StacktraceKey:  "stacktrace",
+			EncodeLevel:    zapcore.LowercaseLevelEncoder,
+			EncodeTime:     zapcore.ISO8601TimeEncoder,
+			EncodeDuration: zapcore.StringDurationEncoder,
+			EncodeCaller:   zapcore.ShortCallerEncoder,
+		},
+		// OutputPaths:      []string{"stdout", "./log/development.out.log"},
+		// ErrorOutputPaths: []string{"stderr", "./log/development.err.log"},
+	}
+	zaplogger, err := conf.Build()
+	zaplogger.Debug(
+		"Zap logging test",
+		zap.String("trace", trace),
+	)
+	// ------------------- cloud logging --------------------------
 	log.Println("NewLogger entering")
 	ctx := context.Background()
 
 	// Sets your Google Cloud Platform project ID.
-	projectID := "kaigofika-poc01"
+	// projectID := "kaigofika-poc01"
 
 	// Creates a client.
 	loggingclient, err := logging.NewClient(ctx, projectID)
@@ -42,7 +88,7 @@ func workflowHandler(w http.ResponseWriter, r *http.Request) {
 	// Selects the log to write to.
 	logger := loggingclient.Logger(logName)
 	log.Printf("logger: %v", logger)
-	// ----------------
+	// --------------------------------------------------------------
 	// logger := logger.NewLogger()
 	logger.Log(logging.Entry{
 		Payload: struct{ Message string }{
