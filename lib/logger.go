@@ -20,7 +20,7 @@ func NewLogger() *logging.Logger {
 	if err != nil {
 		log.Fatalf("Failed to create client: %v", err)
 	}
-	defer client.Close()
+	// defer client.Close()
 	log.Printf("client: %v", client)
 
 	// Sets the name of the log to write to.

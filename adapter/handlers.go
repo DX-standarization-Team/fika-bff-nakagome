@@ -15,15 +15,35 @@ import (
 	"google.golang.org/api/idtoken"
 
 	"cloud.google.com/go/logging"
-	logger "github.com/GoogleCloudPlatform/golang-samples/run/helloworld/lib"
+	// logger "github.com/GoogleCloudPlatform/golang-samples/run/helloworld/lib"
 )
 
 // BFF → workflow → api1 呼び出し
 func workflowHandler(w http.ResponseWriter, r *http.Request) {
 
 	log.Println("workflowHandler entering")
+	// cloud logging
+	log.Println("NewLogger entering")
+	ctx := context.Background()
 
-	logger := logger.NewLogger()
+	// Sets your Google Cloud Platform project ID.
+	projectID := "kaigofika-poc01"
+
+	// Creates a client.
+	loggingclient, err := logging.NewClient(ctx, projectID)
+	if err != nil {
+		log.Fatalf("Failed to create client: %v", err)
+	}
+	defer loggingclient.Close()
+	log.Printf("client: %v", loggingclient)
+
+	// Sets the name of the log to write to.
+	logName := "my-log"
+	// Selects the log to write to.
+	logger := loggingclient.Logger(logName)
+	log.Printf("logger: %v", logger)
+	// ----------------
+	// logger := logger.NewLogger()
 	logger.Log(logging.Entry{
 		Payload: struct{ Message string }{
 			Message: "workflowHandler entering",
@@ -36,7 +56,7 @@ func workflowHandler(w http.ResponseWriter, r *http.Request) {
 	log.Printf("Authorization: %s", r.Header.Get("Authorization"))
 	log.Printf("X-Forwarded-Authorization: %s", r.Header.Get("X-Forwarded-Authorization"))
 	token := r.Header.Get("X-Forwarded-Authorization")
-	ctx := context.Background()
+	// ctx := context.Background()
 
 	// Workflowアクセス用のクライアントライブラリを準備
 	client, err := executions.NewClient(ctx)
