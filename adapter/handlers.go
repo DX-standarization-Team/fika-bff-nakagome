@@ -13,11 +13,26 @@ import (
 	// authorization "github.com/DX-standarization-Team/common-service-v2/middleware/authorization"
 	"github.com/GoogleCloudPlatform/golang-samples/run/helloworld/config"
 	"google.golang.org/api/idtoken"
+
+	"cloud.google.com/go/logging"
+	logger "github.com/GoogleCloudPlatform/golang-samples/run/helloworld/lib"
 )
 
 // BFF → workflow → api1 呼び出し
 func workflowHandler(w http.ResponseWriter, r *http.Request) {
+
 	log.Println("workflowHandler entering")
+
+	logger := logger.NewLogger()
+	logger.Log(logging.Entry{
+		Payload: struct{ Message string }{
+			Message: "workflowHandler entering",
+		},
+		Severity: logging.Debug,
+		HTTPRequest: &logging.HTTPRequest{
+			Request: r,
+		},
+	})
 	log.Printf("Authorization: %s", r.Header.Get("Authorization"))
 	log.Printf("X-Forwarded-Authorization: %s", r.Header.Get("X-Forwarded-Authorization"))
 	token := r.Header.Get("X-Forwarded-Authorization")
