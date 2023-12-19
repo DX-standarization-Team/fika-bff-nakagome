@@ -6,7 +6,6 @@ import (
 	"io"
 	"log"
 	"net/http"
-	"strings"
 
 	executions "cloud.google.com/go/workflows/executions/apiv1"
 	executionspb "cloud.google.com/go/workflows/executions/apiv1/executionspb"
@@ -30,18 +29,20 @@ type Payload struct {
 func workflowHandler(w http.ResponseWriter, r *http.Request) {
 
 	log.Println("workflowHandler entering")
-
-	log.Printf("operationId: %v", r.Header["traceparent"])
+	oprationId := r.Header.Get("traceparent")
+	log.Printf("operationId: %v", oprationId)
 	projectID := "kaigofika-poc01"
+
 	var trace string
-	if projectID != "" {
-		traceHeader := r.Header.Get("X-Cloud-Trace-Context")
-		traceParts := strings.Split(traceHeader, "/")
-		if len(traceParts) > 0 && len(traceParts[0]) > 0 {
-			trace = fmt.Sprintf("projects/%s/traces/%s", projectID, traceParts[0])
-		}
+	formatString := "projects/" + projectID + "/traces/%s"
+	// Use Sscanf to extract values
+	_, err := fmt.Sscanf(r.Header.Get("X-Cloud-Trace-Context"), formatString, &trace)
+	if err != nil {
+		fmt.Println("Error:", err)
+		return
 	}
-	log.Printf("TraceID: %v", trace)
+	// Print the extracted values
+	fmt.Println("Trace:", trace)
 
 	// ------------------- zap logger --------------------------
 	conf := zap.Config{
@@ -67,6 +68,7 @@ func workflowHandler(w http.ResponseWriter, r *http.Request) {
 	zaplogger.Debug(
 		"Zap logging test",
 		zap.String("trace", trace),
+		zap.String("oprationId", oprationId),
 	)
 	// ------------------- cloud logging --------------------------
 	log.Println("NewLogger entering")
