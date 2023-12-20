@@ -2,6 +2,7 @@ package router
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"io"
 	"log"
@@ -111,12 +112,13 @@ func workflowHandler(w http.ResponseWriter, r *http.Request) {
 	// }).Debug("logrus test")
 
 	// ------------------- log package --------------------------
-	log.Println(LogContent{
+	logMessage := LogContent{
 		Message:     "### log package test",
 		Severity:    "DEBUG",
 		Trace:       trace,
 		OperationId: operationId,
-	})
+	}
+	log.Println(json.Marshal(logMessage))
 	// ------------------- cloud logging --------------------------
 	log.Println("cloud logging entering")
 	ctx := context.Background()
