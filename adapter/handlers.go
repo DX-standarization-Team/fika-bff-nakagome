@@ -23,7 +23,9 @@ import (
 )
 
 type Payload struct {
-	Data interface{}
+	message    string
+	trace      string
+	oprationId string
 }
 
 // BFF → workflow → api1 呼び出し
@@ -77,6 +79,12 @@ func workflowHandler(w http.ResponseWriter, r *http.Request) {
 		zap.String("oprationId", oprationId),
 	)
 
+	logstruct := Payload{
+		message:    "Zap logging test",
+		trace:      trace,
+		oprationId: oprationId,
+	}
+	log.Println(logstruct)
 	// ------------------- cloud logging --------------------------
 	log.Println("NewLogger entering")
 	ctx := context.Background()
