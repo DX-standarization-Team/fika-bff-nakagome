@@ -16,19 +16,24 @@ import (
 	"google.golang.org/api/idtoken"
 
 	"cloud.google.com/go/logging"
-
-	"github.com/sirupsen/logrus"
 	// logger "github.com/GoogleCloudPlatform/golang-samples/run/helloworld/lib"
 	// "go.opentelemetry.io/otel/sdk/trace"
 )
+
+type LogContent struct {
+	Message     string `json:"message"`
+	Severity    string `json:"severity"`
+	Trace       string `json:"logging.googleapis.com/trace"`
+	OperationId string `json:"operationId"`
+}
 
 // BFF → workflow → api1 呼び出し
 func workflowHandler(w http.ResponseWriter, r *http.Request) {
 
 	log.Println("workflowHandler entering")
 	log.Printf("Header: %v", r.Header)
-	oprationId := r.Header.Get("traceparent")
-	log.Printf("operationId: %v", oprationId)
+	operationId := r.Header.Get("traceparent")
+	log.Printf("operationId: %v", operationId)
 	projectID := "kaigofika-poc01"
 
 	var traceId string
@@ -73,7 +78,7 @@ func workflowHandler(w http.ResponseWriter, r *http.Request) {
 	// defer zaplogger.Debug(
 	// 	"Zap logging test",
 	// 	zap.String("trace", trace),
-	// 	zap.String("oprationId", oprationId),
+	// 	zap.String("operationId", operationId),
 	// )
 
 	// ------------------- zap logger 2 --------------------------
@@ -86,25 +91,32 @@ func workflowHandler(w http.ResponseWriter, r *http.Request) {
 	// // Log with fields
 	// zaplogger.Debug("Zap logging test",
 	// 	zap.String("trace", trace),
-	// 	zap.String("oprationId", oprationId),
+	// 	zap.String("operationId", operationId),
 	// )
 
 	// ------------------- logrus logger --------------------------
 
-	log.Println("logrus entering")
+	// log.Println("logrus entering")
 
-	// Create a new logger instance
-	logruslogger := logrus.New()
+	// // Create a new logger instance
+	// logruslogger := logrus.New()
 
-	// Set the logger to JSON formatter
-	logruslogger.SetFormatter(&logrus.JSONFormatter{})
+	// // Set the logger to JSON formatter
+	// logruslogger.SetFormatter(&logrus.JSONFormatter{})
 
-	// Log with fields
-	logruslogger.WithFields(logrus.Fields{
-		"logging.googleapis.com/trace": trace,
-		"oprationId":                   oprationId,
-	}).Debug("logrus test")
+	// // Log with fields
+	// logruslogger.WithFields(logrus.Fields{
+	// 	"logging.googleapis.com/trace": trace,
+	// 	"operationId":                   operationId,
+	// }).Debug("logrus test")
 
+	// ------------------- log package --------------------------
+	log.Println(LogContent{
+		Message:     "### log package test",
+		Severity:    "DEBUG",
+		Trace:       trace,
+		OperationId: operationId,
+	})
 	// ------------------- cloud logging --------------------------
 	log.Println("cloud logging entering")
 	ctx := context.Background()
