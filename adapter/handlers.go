@@ -7,15 +7,15 @@ import (
 	"io"
 	"log"
 	"net/http"
-	"os"
 	"strings"
 
 	executions "cloud.google.com/go/workflows/executions/apiv1"
 	executionspb "cloud.google.com/go/workflows/executions/apiv1/executionspb"
+	"go.uber.org/zap"
 
 	// authorization "github.com/DX-standarization-Team/common-service-v2/middleware/authorization"
 	"github.com/GoogleCloudPlatform/golang-samples/run/helloworld/config"
-	"github.com/sirupsen/logrus"
+	// "github.com/sirupsen/logrus"
 	"google.golang.org/api/idtoken"
 
 	"cloud.google.com/go/logging"
@@ -85,34 +85,17 @@ func workflowHandler(w http.ResponseWriter, r *http.Request) {
 	// )
 
 	// ------------------- zap logger 2 --------------------------
-	// zaplogger, err := zap.NewProduction()
-	// if err != nil {
-	// 	panic("Failed to initialize Zap logger")
-	// }
-	// defer zaplogger.Sync() // Flushes buffer, if any
-
-	// // Log with fields
-	// zaplogger.Debug("Zap logging test",
-	// 	zap.String("trace", trace),
-	// 	zap.String("operationId", operationId),
-	// )
-
-	// ------------------- logrus logger --------------------------
-
-	log.Println("logrus entering")
-
-	// Create a new logger instance
-	logruslogger := logrus.New()
-	logruslogger.SetOutput(os.Stdout)
-
-	// Set the logger to JSON formatter
-	logruslogger.SetFormatter(&logrus.JSONFormatter{})
+	zaplogger, err := zap.NewProduction()
+	if err != nil {
+		panic("Failed to initialize Zap logger")
+	}
+	defer zaplogger.Sync() // Flushes buffer, if any
 
 	// Log with fields
-	logruslogger.WithFields(logrus.Fields{
-		"logging.googleapis.com/trace": trace,
-		"operationId":                  operationId,
-	}).Debug("### logrus test")
+	zaplogger.Info("### Zap logging test",
+		zap.String("logging.googleapis.com/trace", trace),
+		zap.String("operationId", operationId),
+	)
 
 	// ------------------- log package → 構造体ログ出力できない --------------------------
 	// logMessage := LogContent{
@@ -122,6 +105,7 @@ func workflowHandler(w http.ResponseWriter, r *http.Request) {
 	// 	OperationId: operationId,
 	// }
 	// log.Println(json.Marshal(logMessage))
+
 	// ------------------- cloud logging --------------------------
 	log.Println("cloud logging entering")
 	ctx := context.Background()
