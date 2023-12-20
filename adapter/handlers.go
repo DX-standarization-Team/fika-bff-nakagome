@@ -22,29 +22,26 @@ import (
 	// "go.opentelemetry.io/otel/sdk/trace"
 )
 
-type Payload struct {
-	message    string
-	trace      string
-	oprationId string
-}
-
 // BFF → workflow → api1 呼び出し
 func workflowHandler(w http.ResponseWriter, r *http.Request) {
 
 	log.Println("workflowHandler entering")
+	log.Printf("Header: %v", r.Header)
 	oprationId := r.Header.Get("traceparent")
 	log.Printf("operationId: %v", oprationId)
 	projectID := "kaigofika-poc01"
 
-	var trace string
+	var traceId string
 	// Use Sscanf to extract values
 	cloudTraceContext := r.Header.Get("X-Cloud-Trace-Context")
 	parts := strings.Split(cloudTraceContext, "/")
 	log.Printf("parts: %v", parts)
 	if len(parts) >= 1 {
-		trace = parts[0]
+		traceId = parts[0]
 	}
 
+	// "projects/[プロジェクトID]/traces/[トレースID]" の形式
+	trace := "projects/" + projectID + "/traces/" + traceId
 	fmt.Println("Trace:", trace)
 
 	// ------------------- zap logger --------------------------
@@ -94,20 +91,22 @@ func workflowHandler(w http.ResponseWriter, r *http.Request) {
 
 	// ------------------- logrus logger --------------------------
 
+	log.Println("logrus entering")
+
 	// Create a new logger instance
 	logruslogger := logrus.New()
-
-	// Log with fields
-	logruslogger.WithFields(logrus.Fields{
-		"trace":      trace,
-		"oprationId": oprationId,
-	}).Debug("logrus test")
 
 	// Set the logger to JSON formatter
 	logruslogger.SetFormatter(&logrus.JSONFormatter{})
 
+	// Log with fields
+	logruslogger.WithFields(logrus.Fields{
+		"logging.googleapis.com/trace": trace,
+		"oprationId":                   oprationId,
+	}).Debug("logrus test")
+
 	// ------------------- cloud logging --------------------------
-	log.Println("NewLogger entering")
+	log.Println("cloud logging entering")
 	ctx := context.Background()
 
 	// Sets your Google Cloud Platform project ID.
