@@ -19,7 +19,6 @@ import (
 	// logger "github.com/GoogleCloudPlatform/golang-samples/run/helloworld/lib"
 	// "go.opentelemetry.io/otel/sdk/trace"
 	"go.uber.org/zap"
-	"go.uber.org/zap/zapcore"
 )
 
 type Payload struct {
@@ -48,43 +47,48 @@ func workflowHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("Trace:", trace)
 
 	// ------------------- zap logger --------------------------
-	conf := zap.Config{
-		Level: zap.NewAtomicLevel(),
-		// Development: false,
-		Encoding: "json",
-		EncoderConfig: zapcore.EncoderConfig{
-			TimeKey:        "timestamp",
-			LevelKey:       "severity",
-			NameKey:        "name",
-			CallerKey:      "caller",
-			MessageKey:     "message",
-			StacktraceKey:  "stacktrace",
-			EncodeLevel:    zapcore.LowercaseLevelEncoder,
-			EncodeTime:     zapcore.ISO8601TimeEncoder,
-			EncodeDuration: zapcore.StringDurationEncoder,
-			EncodeCaller:   zapcore.ShortCallerEncoder,
-		},
-		OutputPaths:      []string{"stdout"},
-		ErrorOutputPaths: []string{"stderr"},
-		// OutputPaths:      []string{"stdout", "./log/development.out.log"},
-		// ErrorOutputPaths: []string{"stderr", "./log/development.err.log"},
-	}
-	zaplogger, err := conf.Build()
+	// conf := zap.Config{
+	// 	Level: zap.NewAtomicLevel(),
+	// 	// Development: false,
+	// 	Encoding: "json",
+	// 	EncoderConfig: zapcore.EncoderConfig{
+	// 		TimeKey:        "timestamp",
+	// 		LevelKey:       "severity",
+	// 		NameKey:        "name",
+	// 		CallerKey:      "caller",
+	// 		MessageKey:     "message",
+	// 		StacktraceKey:  "stacktrace",
+	// 		EncodeLevel:    zapcore.LowercaseLevelEncoder,
+	// 		EncodeTime:     zapcore.ISO8601TimeEncoder,
+	// 		EncodeDuration: zapcore.StringDurationEncoder,
+	// 		EncodeCaller:   zapcore.ShortCallerEncoder,
+	// 	},
+	// 	OutputPaths:      []string{"stdout"},
+	// 	ErrorOutputPaths: []string{"stderr"},
+	// 	// OutputPaths:      []string{"stdout", "./log/development.out.log"},
+	// 	// ErrorOutputPaths: []string{"stderr", "./log/development.err.log"},
+	// }
+	// zaplogger, err := conf.Build()
+	// if err != nil {
+	// 	log.Fatalf("Failed to create zap client: %v", err)
+	// }
+	// defer zaplogger.Debug(
+	// 	"Zap logging test",
+	// 	zap.String("trace", trace),
+	// 	zap.String("oprationId", oprationId),
+	// )
+	zaplogger, err := zap.NewProduction()
 	if err != nil {
-		log.Fatalf("Failed to create zap client: %v", err)
+		panic("Failed to initialize Zap logger")
 	}
-	defer zaplogger.Debug(
-		"Zap logging test",
+	defer zaplogger.Sync() // Flushes buffer, if any
+
+	// Log with fields
+	zaplogger.Debug("Zap logging test",
 		zap.String("trace", trace),
 		zap.String("oprationId", oprationId),
 	)
 
-	logstruct := Payload{
-		message:    "Zap logging test",
-		trace:      trace,
-		oprationId: oprationId,
-	}
-	log.Println(logstruct)
 	// ------------------- cloud logging --------------------------
 	log.Println("NewLogger entering")
 	ctx := context.Background()
