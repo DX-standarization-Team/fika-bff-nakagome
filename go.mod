@@ -9,6 +9,8 @@ require (
 	gopkg.in/yaml.v3 v3.0.1
 )
 
+require github.com/sirupsen/logrus v1.9.3 // indirect
+
 require (
 	cloud.google.com/go v0.110.8 // indirect
 	cloud.google.com/go/compute v1.23.1 // indirect

@@ -16,9 +16,10 @@ import (
 	"google.golang.org/api/idtoken"
 
 	"cloud.google.com/go/logging"
+
+	"github.com/sirupsen/logrus"
 	// logger "github.com/GoogleCloudPlatform/golang-samples/run/helloworld/lib"
 	// "go.opentelemetry.io/otel/sdk/trace"
-	"go.uber.org/zap"
 )
 
 type Payload struct {
@@ -77,17 +78,33 @@ func workflowHandler(w http.ResponseWriter, r *http.Request) {
 	// 	zap.String("trace", trace),
 	// 	zap.String("oprationId", oprationId),
 	// )
-	zaplogger, err := zap.NewProduction()
-	if err != nil {
-		panic("Failed to initialize Zap logger")
-	}
-	defer zaplogger.Sync() // Flushes buffer, if any
+
+	// ------------------- zap logger 2 --------------------------
+	// zaplogger, err := zap.NewProduction()
+	// if err != nil {
+	// 	panic("Failed to initialize Zap logger")
+	// }
+	// defer zaplogger.Sync() // Flushes buffer, if any
+
+	// // Log with fields
+	// zaplogger.Debug("Zap logging test",
+	// 	zap.String("trace", trace),
+	// 	zap.String("oprationId", oprationId),
+	// )
+
+	// ------------------- logrus logger --------------------------
+
+	// Create a new logger instance
+	logruslogger := logrus.New()
 
 	// Log with fields
-	zaplogger.Debug("Zap logging test",
-		zap.String("trace", trace),
-		zap.String("oprationId", oprationId),
-	)
+	logruslogger.WithFields(logrus.Fields{
+		"trace":      trace,
+		"oprationId": oprationId,
+	}).Debug("logrus test")
+
+	// Set the logger to JSON formatter
+	logruslogger.SetFormatter(&logrus.JSONFormatter{})
 
 	// ------------------- cloud logging --------------------------
 	log.Println("NewLogger entering")
