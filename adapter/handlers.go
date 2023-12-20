@@ -62,15 +62,21 @@ func workflowHandler(w http.ResponseWriter, r *http.Request) {
 			EncodeDuration: zapcore.StringDurationEncoder,
 			EncodeCaller:   zapcore.ShortCallerEncoder,
 		},
+		OutputPaths:      []string{"stdout"},
+		ErrorOutputPaths: []string{"stderr"},
 		// OutputPaths:      []string{"stdout", "./log/development.out.log"},
 		// ErrorOutputPaths: []string{"stderr", "./log/development.err.log"},
 	}
 	zaplogger, err := conf.Build()
-	zaplogger.Debug(
+	if err != nil {
+		log.Fatalf("Failed to create zap client: %v", err)
+	}
+	defer zaplogger.Debug(
 		"Zap logging test",
 		zap.String("trace", trace),
 		zap.String("oprationId", oprationId),
 	)
+
 	// ------------------- cloud logging --------------------------
 	log.Println("NewLogger entering")
 	ctx := context.Background()
