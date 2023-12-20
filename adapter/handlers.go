@@ -2,11 +2,12 @@ package router
 
 import (
 	"context"
-	"encoding/json"
+	// "encoding/json"
 	"fmt"
 	"io"
 	"log"
 	"net/http"
+	"os"
 	"strings"
 
 	executions "cloud.google.com/go/workflows/executions/apiv1"
@@ -14,6 +15,7 @@ import (
 
 	// authorization "github.com/DX-standarization-Team/common-service-v2/middleware/authorization"
 	"github.com/GoogleCloudPlatform/golang-samples/run/helloworld/config"
+	"github.com/sirupsen/logrus"
 	"google.golang.org/api/idtoken"
 
 	"cloud.google.com/go/logging"
@@ -97,28 +99,29 @@ func workflowHandler(w http.ResponseWriter, r *http.Request) {
 
 	// ------------------- logrus logger --------------------------
 
-	// log.Println("logrus entering")
+	log.Println("logrus entering")
 
-	// // Create a new logger instance
-	// logruslogger := logrus.New()
+	// Create a new logger instance
+	logruslogger := logrus.New()
+	logruslogger.SetOutput(os.Stdout)
 
-	// // Set the logger to JSON formatter
-	// logruslogger.SetFormatter(&logrus.JSONFormatter{})
+	// Set the logger to JSON formatter
+	logruslogger.SetFormatter(&logrus.JSONFormatter{})
 
-	// // Log with fields
-	// logruslogger.WithFields(logrus.Fields{
-	// 	"logging.googleapis.com/trace": trace,
-	// 	"operationId":                   operationId,
-	// }).Debug("logrus test")
+	// Log with fields
+	logruslogger.WithFields(logrus.Fields{
+		"logging.googleapis.com/trace": trace,
+		"operationId":                  operationId,
+	}).Debug("### logrus test")
 
-	// ------------------- log package --------------------------
-	logMessage := LogContent{
-		Message:     "### log package test",
-		Severity:    "DEBUG",
-		Trace:       trace,
-		OperationId: operationId,
-	}
-	log.Println(json.Marshal(logMessage))
+	// ------------------- log package → 構造体ログ出力できない --------------------------
+	// logMessage := LogContent{
+	// 	Message:     "### log package test",
+	// 	Severity:    "DEBUG",
+	// 	Trace:       trace,
+	// 	OperationId: operationId,
+	// }
+	// log.Println(json.Marshal(logMessage))
 	// ------------------- cloud logging --------------------------
 	log.Println("cloud logging entering")
 	ctx := context.Background()
