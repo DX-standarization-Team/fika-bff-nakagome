@@ -7,11 +7,9 @@ import (
 	"io"
 	"log"
 	"net/http"
-	"strings"
 
 	executions "cloud.google.com/go/workflows/executions/apiv1"
 	executionspb "cloud.google.com/go/workflows/executions/apiv1/executionspb"
-	"go.uber.org/zap"
 
 	// authorization "github.com/DX-standarization-Team/common-service-v2/middleware/authorization"
 	"github.com/GoogleCloudPlatform/golang-samples/run/helloworld/config"
@@ -23,95 +21,17 @@ import (
 	// "go.opentelemetry.io/otel/sdk/trace"
 )
 
-type LogContent struct {
-	Message     string `json:"message"`
-	Severity    string `json:"severity"`
-	Trace       string `json:"logging.googleapis.com/trace"`
-	OperationId string `json:"operationId"`
-}
-
 // BFF → workflow → api1 呼び出し
 func workflowHandler(w http.ResponseWriter, r *http.Request) {
 
 	log.Println("workflowHandler entering")
-	log.Printf("Header: %v", r.Header)
-	operationId := r.Header.Get("traceparent")
-	log.Printf("operationId: %v", operationId)
-	projectID := "kaigofika-poc01"
-
-	var traceId string
-	// Use Sscanf to extract values
-	cloudTraceContext := r.Header.Get("X-Cloud-Trace-Context")
-	parts := strings.Split(cloudTraceContext, "/")
-	log.Printf("parts: %v", parts)
-	if len(parts) >= 1 {
-		traceId = parts[0]
-	}
-
-	// "projects/[プロジェクトID]/traces/[トレースID]" の形式
-	trace := "projects/" + projectID + "/traces/" + traceId
-	fmt.Println("Trace:", trace)
-
-	// ------------------- zap logger --------------------------
-	// conf := zap.Config{
-	// 	Level: zap.NewAtomicLevel(),
-	// 	// Development: false,
-	// 	Encoding: "json",
-	// 	EncoderConfig: zapcore.EncoderConfig{
-	// 		TimeKey:        "timestamp",
-	// 		LevelKey:       "severity",
-	// 		NameKey:        "name",
-	// 		CallerKey:      "caller",
-	// 		MessageKey:     "message",
-	// 		StacktraceKey:  "stacktrace",
-	// 		EncodeLevel:    zapcore.LowercaseLevelEncoder,
-	// 		EncodeTime:     zapcore.ISO8601TimeEncoder,
-	// 		EncodeDuration: zapcore.StringDurationEncoder,
-	// 		EncodeCaller:   zapcore.ShortCallerEncoder,
-	// 	},
-	// 	OutputPaths:      []string{"stdout"},
-	// 	ErrorOutputPaths: []string{"stderr"},
-	// 	// OutputPaths:      []string{"stdout", "./log/development.out.log"},
-	// 	// ErrorOutputPaths: []string{"stderr", "./log/development.err.log"},
-	// }
-	// zaplogger, err := conf.Build()
-	// if err != nil {
-	// 	log.Fatalf("Failed to create zap client: %v", err)
-	// }
-	// defer zaplogger.Debug(
-	// 	"Zap logging test",
-	// 	zap.String("trace", trace),
-	// 	zap.String("operationId", operationId),
-	// )
-
-	// ------------------- zap logger 2 --------------------------
-	zaplogger, err := zap.NewProduction()
-	if err != nil {
-		panic("Failed to initialize Zap logger")
-	}
-	defer zaplogger.Sync() // Flushes buffer, if any
-
-	// Log with fields
-	zaplogger.Info("### Zap logging test",
-		zap.String("logging.googleapis.com/trace", trace),
-		zap.String("operationId", operationId),
-	)
-
-	// ------------------- log package → 構造体ログ出力できない --------------------------
-	// logMessage := LogContent{
-	// 	Message:     "### log package test",
-	// 	Severity:    "DEBUG",
-	// 	Trace:       trace,
-	// 	OperationId: operationId,
-	// }
-	// log.Println(json.Marshal(logMessage))
 
 	// ------------------- cloud logging --------------------------
 	log.Println("cloud logging entering")
 	ctx := context.Background()
 
 	// Sets your Google Cloud Platform project ID.
-	// projectID := "kaigofika-poc01"
+	projectID := "kaigofika-poc01"
 
 	// Creates a client.
 	loggingclient, err := logging.NewClient(ctx, projectID)
@@ -119,24 +39,38 @@ func workflowHandler(w http.ResponseWriter, r *http.Request) {
 		log.Fatalf("Failed to create client: %v", err)
 	}
 	defer loggingclient.Close()
-	log.Printf("client: %v", loggingclient)
 
 	// Sets the name of the log to write to.
 	logName := "my-log"
+
 	// Selects the log to write to.
 	logger := loggingclient.Logger(logName)
-	log.Printf("logger: %v", logger)
-	// --------------------------------------------------------------
-	// logger := logger.NewLogger()
-	logger.Log(logging.Entry{
-		Payload: struct{ Message string }{
-			Message: "workflowHandler entering",
-		},
-		Severity: logging.Debug,
+
+	// Add key-value pairs to the map
+	labels := make(map[string]string)
+	labels["fikaid"] = "01234"
+	labels["tenantId"] = "test-tenant-01"
+	labels["ipAddress"] = r.Header.Get("X-Fowarded-For")
+
+	entry := logging.Entry{
+		Payload:  fmt.Sprintf("create user succeeded. userId: %s", "testUserId"),
+		Severity: logging.Info,
 		HTTPRequest: &logging.HTTPRequest{
 			Request: r,
 		},
-	})
+		Labels: labels,
+	}
+	type Body struct {
+		text string
+	}
+	body := Body{
+		text: "test",
+	}
+	entry.Payload = fmt.Sprintf("%s\nRequest Body: %s", entry.Payload, body)
+	// entry.Payload = fmt.Sprintf("%s\nRequest Body: %s", entry.Payload, r.GetBody)
+	logger.Log(entry)
+	// --------------------------------------------------------------
+
 	log.Printf("Authorization: %s", r.Header.Get("Authorization"))
 	log.Printf("X-Forwarded-Authorization: %s", r.Header.Get("X-Forwarded-Authorization"))
 	token := r.Header.Get("X-Forwarded-Authorization")
