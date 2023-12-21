@@ -1,0 +1,79 @@
+# kaigofica-ap-functions.yaml
+swagger: "2.0"
+host: fs-api-nakagome-0tyzfhmac82ov.apigateway.kaigofika-poc01.cloud.goog
+info:
+  title: hello_test
+  description: Sample API on API Gateway with a Google Cloud Functions backend
+  version: 1.0.0
+schemes:
+  - https
+produces:
+  - application/json
+x-google-endpoints:
+  - name: fs-api-nakagome-0tyzfhmac82ov.apigateway.kaigofika-poc01.cloud.goog
+    allowCors: True
+paths:
+  /bff/workflow:
+    options:
+      summary: echo message cors workflow api1
+      operationId: corsWorkflowApi1
+      x-google-backend:
+        address: https://fika-bff-nakagome-wsgwmfbvhq-uc.a.run.app/workflow
+        path_translation: CONSTANT_ADDRESS
+      responses:
+        "200":
+          description: A successful response
+          schema:
+            type: string
+    get:
+      summary: echo message workflow api1
+      operationId: workflowApi1
+      x-google-backend:
+        address: https://fika-bff-nakagome-wsgwmfbvhq-uc.a.run.app/workflow
+        path_translation: CONSTANT_ADDRESS
+      responses:
+        "200":
+          description: A successful response
+          schema:
+            type: string
+  /bff/api2:
+    options:
+      summary: echo message cors workflow api2
+      operationId: corsWorkflowApi2
+      x-google-backend:
+        address: https://fika-bff-nakagome-wsgwmfbvhq-uc.a.run.app/api2
+        path_translation: CONSTANT_ADDRESS
+      responses:
+        "200":
+          description: A successful response
+          schema:
+            type: string
+    get:
+      summary: echo message workflow api2
+      operationId: workflowApi2
+      x-google-backend:
+        address: https://fika-bff-nakagome-wsgwmfbvhq-uc.a.run.app/api2
+        path_translation: CONSTANT_ADDRESS
+      responses:
+        "200":
+          description: A successful response
+          schema:
+            type: string
+securityDefinitions:
+  auth0_jwk:
+    authorizationUrl: ""
+    flow: "implicit"
+    type: "oauth2"
+    x-google-issuer: "https://dev-kjqwuq76z8suldgw.us.auth0.com/"
+    x-google-jwks_uri: "https://dev-kjqwuq76z8suldgw.us.auth0.com/.well-known/jwks.json"
+    x-google-audiences: "NHa9bhhaP46k4sD7wqdaa80dsJGzv2yo,https://fs-apigw-bff-nakagome-bi5axj14.uc.gateway.dev/"
+  firebase:
+    authorizationUrl: ""
+    flow: "implicit"
+    type: "oauth2"
+    x-google-issuer: "https://securetoken.google.com/kaigofika-poc01"
+    x-google-jwks_uri: "https://www.googleapis.com/service_accounts/v1/metadata/x509/securetoken@system.gserviceaccount.com"
+    x-google-audiences: " kaigofika-poc01"
+security:
+  - auth0_jwk: []
+  - firebase: []

@@ -25,6 +25,7 @@ import (
 func workflowHandler(w http.ResponseWriter, r *http.Request) {
 
 	log.Println("workflowHandler entering")
+	log.Println(r.Header)
 
 	// ------------------- cloud logging --------------------------
 	log.Println("cloud logging entering")
