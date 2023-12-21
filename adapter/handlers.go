@@ -20,7 +20,7 @@ import (
 	"cloud.google.com/go/logging"
 )
 
-var openAPIFile = "/util/openapi.yaml"
+var openAPIFile = "util/openapi.yaml"
 
 type OpenAPISpec struct {
 	Paths map[string]PathItem `yaml:"paths"`
