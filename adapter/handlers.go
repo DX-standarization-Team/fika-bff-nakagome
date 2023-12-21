@@ -25,7 +25,12 @@ import (
 func workflowHandler(w http.ResponseWriter, r *http.Request) {
 
 	log.Println("workflowHandler entering")
-	log.Println(r.Header)
+	// log.Println(r.Header)
+	log.Printf("Request URL: %s", r.URL)
+	log.Printf("Request URL Path: %s", r.URL.Path)
+	log.Printf("Request Method: %s", r.Method)
+	log.Printf("Request URL User: %s", r.URL.User)
+	log.Printf("Request URL RawQuery: %s", r.URL.RawQuery)
 
 	// ------------------- cloud logging --------------------------
 	log.Println("cloud logging entering")
@@ -67,6 +72,7 @@ func workflowHandler(w http.ResponseWriter, r *http.Request) {
 	body := Body{
 		text: "test",
 	}
+
 	entry.Payload = fmt.Sprintf("%s\nRequest Body: %s", entry.Payload, body)
 	// entry.Payload = fmt.Sprintf("%s\nRequest Body: %s", entry.Payload, r.GetBody)
 	logger.Log(entry)
