@@ -73,6 +73,25 @@ func workflowHandler(w http.ResponseWriter, r *http.Request) {
 	// log.Printf("Request URL RawQuery: %s", r.URL.RawQuery)
 
 	// ------------------- Open API specification --------------------------
+	wd, err := os.Getwd()
+	if err != nil {
+		fmt.Println("Error getting working directory:", err)
+		return
+	}
+
+	fmt.Println("Working Directory:", wd)
+
+	_, err = os.Stat(openAPIFile)
+	if err != nil {
+		if os.IsNotExist(err) {
+			fmt.Println("File does not exist:", openAPIFile)
+		} else {
+			fmt.Println("Error checking file:", err)
+		}
+		return
+	}
+	fmt.Println("File exists:", openAPIFile)
+
 	openAPISpec, err := loadOpenAPIFile(openAPIFile)
 	if err != nil {
 		log.Println("Error reading OpenAPI file:", err)
