@@ -2,7 +2,8 @@ package router
 
 import (
 	"context"
-	// "encoding/json"
+	"os"
+
 	"fmt"
 	"io"
 	"log"
@@ -10,27 +11,86 @@ import (
 
 	executions "cloud.google.com/go/workflows/executions/apiv1"
 	executionspb "cloud.google.com/go/workflows/executions/apiv1/executionspb"
+	"gopkg.in/yaml.v3"
 
 	// authorization "github.com/DX-standarization-Team/common-service-v2/middleware/authorization"
 	"github.com/GoogleCloudPlatform/golang-samples/run/helloworld/config"
-	// "github.com/sirupsen/logrus"
 	"google.golang.org/api/idtoken"
 
 	"cloud.google.com/go/logging"
-	// logger "github.com/GoogleCloudPlatform/golang-samples/run/helloworld/lib"
-	// "go.opentelemetry.io/otel/sdk/trace"
 )
+
+var openAPIFile = "./openapi.yaml"
+
+type OpenAPISpec struct {
+	Paths map[string]PathItem `yaml:"paths"`
+}
+
+type PathItem map[string]Operation
+
+type Operation struct {
+	OperationID string `yaml:"operationId"`
+}
+
+func getOperationID(path, method string, spec *OpenAPISpec) (string, error) {
+	pathItem, ok := spec.Paths[path]
+	if !ok {
+		return "", fmt.Errorf("Path not found: %s", path)
+	}
+
+	operation, ok := pathItem[method]
+	if !ok {
+		return "", fmt.Errorf("Method not found for path %s: %s", path, method)
+	}
+
+	return operation.OperationID, nil
+}
+
+func loadOpenAPIFile(filePath string) (*OpenAPISpec, error) {
+	content, err := os.ReadFile(filePath)
+	if err != nil {
+		return nil, err
+	}
+
+	var spec OpenAPISpec
+	err = yaml.Unmarshal(content, &spec)
+	if err != nil {
+		return nil, err
+	}
+
+	return &spec, nil
+}
 
 // BFF → workflow → api1 呼び出し
 func workflowHandler(w http.ResponseWriter, r *http.Request) {
 
 	log.Println("workflowHandler entering")
 	// log.Println(r.Header)
-	log.Printf("Request URL: %s", r.URL)
-	log.Printf("Request URL Path: %s", r.URL.Path)
-	log.Printf("Request Method: %s", r.Method)
-	log.Printf("Request URL User: %s", r.URL.User)
-	log.Printf("Request URL RawQuery: %s", r.URL.RawQuery)
+	// log.Printf("Request URL: %s", r.URL)
+	// log.Printf("Request URL Path: %s", r.URL.Path)
+	// log.Printf("Request Method: %s", r.Method)
+	// log.Printf("Request URL User: %s", r.URL.User)
+	// log.Printf("Request URL RawQuery: %s", r.URL.RawQuery)
+
+	// ------------------- Open API specification --------------------------
+	openAPISpec, err := loadOpenAPIFile(openAPIFile)
+	if err != nil {
+		log.Println("Error reading OpenAPI file:", err)
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		return
+	}
+
+	path := r.URL.Path
+	method := r.Method
+
+	operationID, err := getOperationID(path, method, openAPISpec)
+	if err != nil {
+		log.Println("Error getting OperationID:", err)
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		return
+	}
+
+	log.Printf("OperationID: %s\n", operationID)
 
 	// ------------------- cloud logging --------------------------
 	log.Println("cloud logging entering")
@@ -60,7 +120,7 @@ func workflowHandler(w http.ResponseWriter, r *http.Request) {
 
 	entry := logging.Entry{
 		Payload:  fmt.Sprintf("create user succeeded. userId: %s", "testUserId"),
-		Severity: logging.Info,
+		Severity: logging.Debug,
 		HTTPRequest: &logging.HTTPRequest{
 			Request: r,
 		},
